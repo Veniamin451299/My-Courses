@@ -1,0 +1,8 @@
+Курс-тренажёр по JavaScript
+https://www.freecodecamp.org/learn/javascript-algorithms-and-data-structures/#basic-javascript
+
+Современный учебник по JavaScript:
+https://learn.javascript.ru
+
+Ещё один курс-тренажёр по JavaScript:
+https://code-basics.com/ru/languages/javascript/lessons/linting

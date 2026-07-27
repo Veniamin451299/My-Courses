@@ -1,0 +1,86 @@
+# ==========================================
+# 📦 ЗАВИСИМОСТИ И СБОРКА: JAVASCRIPT / NODE.JS
+# ==========================================
+node_modules/
+/jspm_packages/
+/web_modules/
+.npm/
+.eslintcache
+.stylelintcache
+.prettiercache
+# Логи ошибок
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ==========================================
+# 📦 ЗАВИСИМОСТИ И СБОРКА: PYTHON
+# ==========================================
+# Виртуальные окружения
+.venv/
+venv/
+ENV/
+env/
+# Кэш компиляции Python
+__pycache__/
+*.py[cod]
+*$py.class
+# Распределенные пакеты и сборка
+.eggs/
+build/
+dist/
+*.egg-info/
+
+# ==========================================
+# 📦 ЗАВИСИМОСТИ И СБОРКА: C++ / C
+# ==========================================
+# Результаты компиляции и сборки
+build/
+Bin/
+Obj/
+*.out
+*.exe
+*.app
+*.o
+*.a
+*.so
+*.dylib
+# Специфично для CMake
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Makefile
+cmake_install.cmake
+
+# ==========================================
+# 🛠 РЕДАКТОРЫ КОДА И IDE
+# ==========================================
+# VS Code (Visual Studio Code)
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+*.code-workspace
+
+# JetBrains (WebStorm, PyCharm, CLion, IntelliJ IDEA и др.)
+.idea/
+*.iws
+
+# ==========================================
+# 🔒 ПЕРЕМЕННЫЕ ОКРУЖЕНИЯ (Секреты)
+# ==========================================
+# Скрываем файлы настроек .env, чтобы не утекли пароли бд (например, из Prisma)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+# Оставляем только шаблон для других разработчиков
+!.env.example
+
+# ==========================================
+# 🍏 СИСТЕМНЫЕ ФАЙЛЫ
+# ==========================================
+.DS_Store
+Thumbs.db
