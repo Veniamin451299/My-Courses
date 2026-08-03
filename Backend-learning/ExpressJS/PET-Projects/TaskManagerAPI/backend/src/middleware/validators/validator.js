@@ -19,6 +19,21 @@ const toDoSchema = z.object({
         .transform(sanitizeString), // автоматически очистит description
 });
 
+// Оаисываем схему валидации данных для регистрации
+const registerSchema = z.object({
+  email: z.string({ required_error: 'Электронная почта пользователя обязательна' })
+        .min(6, 'Электронная почта слишком короткая')
+        .transform(sanitizeString) // автоматически очистит email
+        .email('Некорректный адрес электронной почты')
+        .toLowerCase(),
+
+
+  password: z.string({ required_error: 'Пароль пользователя обязателен' })
+        .min(8, 'Пароль пользователя слишком короткий')
+        .max(20, 'Пароль пользователя слишком длинный')
+        .transform(sanitizeString),
+})
+
 // Создаем универсальный мидлварь-валидатор
 const validator = (schema) => (req, res, next) => {
     try {
@@ -32,4 +47,4 @@ const validator = (schema) => (req, res, next) => {
     }
 }
 
-module.exports = { validator, toDoSchema };
+module.exports = { validator, toDoSchema, registerSchema };

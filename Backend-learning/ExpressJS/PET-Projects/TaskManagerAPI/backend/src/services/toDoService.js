@@ -4,35 +4,35 @@ const prisma = new PrismaClient();
 
 class ToDoService {
     // GET: get all tasks
-    async getAllTasks() {
-        return await prisma.task.findMany();
+    async getAllTasks(userId) {
+        return await prisma.task.findMany({ where: { userId } });
     }
 
     // GET: get task by id
-    async getTaskById(id) {
-        return await prisma.task.findUnique({
-            where: { id: Number(id) },
+    async getTaskById(userId, taskId) {
+        return await prisma.task.findFirst({
+            where: { id: taskId, userId: userId },
         });
     }
 
     // POST: create task
-    async createTask(task) {
+    async createTask(userId, taskData) {
         return await prisma.task.create({
-            data: task,
+            data: { ...taskData, userId },
         });
     }
 
     // PUT: update task
-    async updateTask(id, task) {
+    async updateTask(taskId, taskData) {
         return await prisma.task.update({
-            where: { id: Number(id) },
-            data: task,
+            where: { id: taskId },
+            data: taskData
         });
     }
     // DELETE: delete task
-    async deleteTask(id) {
+    async deleteTask(taskId) {
         return await prisma.task.delete({
-            where: { id: Number(id) },
+            where: { id: taskId },
         });
     }
 }

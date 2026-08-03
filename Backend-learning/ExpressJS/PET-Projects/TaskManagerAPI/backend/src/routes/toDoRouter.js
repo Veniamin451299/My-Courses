@@ -2,22 +2,24 @@
 const { Router } = require('express');
 const toDoController = require('../controllers/toDoController');
 const { toDoSchema, validator } = require('../middleware/validators/validator');
+const authMiddleware = require('../middleware/authMiddleware');
 
 const router = Router();
+router.use(authMiddleware); // Саязка автора и его задач на глобальном уровне для всех задач
 
-// GET /todo/tasks - Get all tasks
+// GET /api/tasks - Get all tasks
 router.get('/', toDoController.getAllTasks);
 
-// GET /todo/tasks/:id - Get a task by ID
+// GET /api/tasks/:id - Get a task by ID
 router.get('/:id', toDoController.getTaskById);
 
-// POST /todo/tasks - Create a new task
+// POST /api/tasks - Create a new task
 router.post('/', validator(toDoSchema), toDoController.createTask);
 
-// PUT /todo/tasks/:id - Update a task by ID
+// PUT /api/tasks/:id - Update a task by ID
 router.put('/:id', validator(toDoSchema), toDoController.updateTask);
 
-// DELETE /todo/tasks/:id - Delete a task by ID
+// DELETE /api/tasks/:id - Delete a task by ID
 router.delete('/:id', toDoController.deleteTask);
 
 module.exports = router;
