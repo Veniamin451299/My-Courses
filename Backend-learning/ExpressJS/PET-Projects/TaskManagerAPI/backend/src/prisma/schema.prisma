@@ -23,4 +23,6 @@ model Task {
 
   userId Int
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([id, userId])
 }
