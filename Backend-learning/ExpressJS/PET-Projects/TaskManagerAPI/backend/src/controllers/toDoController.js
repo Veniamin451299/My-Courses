@@ -5,6 +5,11 @@ const HashIdHelper = require('../utils/hashid');
 const redisClient = require('../config/redis');
 
 class ToDoController { 
+    /** list of tasks
+     * @route GET /api/tasks
+     * @description Get all tasks of current user
+     * @access Private
+     **/
     async getAllTasks(req, res, next) { 
         try {
             const userId = req.user.id; // Получаем от какого пользоватля запрос
@@ -23,6 +28,11 @@ class ToDoController {
             next(new InternalServerError(`Internal Server Error: ${error.message}`));
         }
     }
+    /** Get task by ID
+     * @route GET /api/tasks/:id
+     * @description Get a task by ID
+     * @access Private
+     **/
     async getTaskById(req, res, next) { 
         try {
             const userId = req.user.id; // Получаем от какого пользователя запрос
@@ -45,6 +55,11 @@ class ToDoController {
         }
     } 
     
+    /** Create task
+     * @route POST /api/tasks
+     * @description Create a task
+     * @access Private
+     **/
     async createTask(req, res, next) { 
         try {
             const userId = req.user.id;
@@ -64,6 +79,11 @@ class ToDoController {
         }
     }
 
+    /** Update task
+     * @route PUT /api/tasks/:id
+     * @description Update a task
+     * @access Private
+     **/
     async updateTask(req, res, next) { 
         try {
             const userId = req.user.id;
@@ -76,7 +96,7 @@ class ToDoController {
             // Маскируем ID через деструктуризацию
             const responseData = {
                 ...updatedTask,
-                id: HashIdHelper.generateHas(updatedTask.id)
+                id: HashIdHelper.generateHash(updatedTask.id)
             };
 
             res.json(responseData);
@@ -85,6 +105,11 @@ class ToDoController {
         }
     }
 
+    /** Delete task
+     * @route DELETE /api/tasks/:id
+     * @description Delete a task
+     * @access Private
+     **/
     async deleteTask(req, res, next) { 
         try {
             const userId = req.user.id;
