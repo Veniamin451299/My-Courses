@@ -1,6 +1,9 @@
 // path: backend/src/services/authService.js
-const {PrismaClient} = require('@prisma/client');
-const prisma = new PrismaClient();
+const { PrismaPg } = require('@prisma/adapter-pg');
+const { PrismaClient } = require('@prisma/client');
+
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const prisma = new PrismaClient({ adapter });
 
 class AuthService {
     // GET: find user by email

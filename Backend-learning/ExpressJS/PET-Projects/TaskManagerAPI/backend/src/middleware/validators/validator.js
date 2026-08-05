@@ -23,9 +23,10 @@ const toDoSchema = z.object({
 const registerSchema = z.object({
   email: z.string({ required_error: 'Электронная почта пользователя обязательна' })
         .min(6, 'Электронная почта слишком короткая')
-        .transform(sanitizeString) // автоматически очистит email
         .email('Некорректный адрес электронной почты')
-        .toLowerCase(),
+        .toLowerCase()
+        .transform(sanitizeString), // автоматически очистит email
+        
 
 
   password: z.string({ required_error: 'Пароль пользователя обязателен' })
