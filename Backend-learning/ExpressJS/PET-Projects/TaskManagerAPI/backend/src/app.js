@@ -40,6 +40,8 @@ async function startServer() {
             console.log('');
             console.log('TODO API Server');
             console.log(`Server successfully started on port ${port}`);
+            console.log(`Local URL: http://localhost:${port}`);
+            console.log('DATABASE_URL:', process.env.DATABASE_URL);
             console.log(`Mode: ${config.nodeEnv}`);
             console.log(`Timestamp: ${new Date().toISOString()}`);
             console.log('');
