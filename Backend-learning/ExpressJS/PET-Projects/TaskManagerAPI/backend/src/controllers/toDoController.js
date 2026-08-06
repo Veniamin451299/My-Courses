@@ -20,7 +20,8 @@ class ToDoController {
             // Маскируем ID через map, создавая новые объекты (Анти-мутирование оригинала)
             const responseData = tasks.map((task) => ({
                 ...task,
-                id: HashIdHelper.generateHash(task.id)
+                id: HashIdHelper.generateHash(task.id),
+                userId: HashIdHelper.generateHash(task.userId),
             }));
 
             res.json(responseData);
@@ -46,7 +47,8 @@ class ToDoController {
             // Маскируем ID через деструктуризацию
             const responseData = {
                 ...task,
-                id: HashIdHelper.generateHash(task.id)
+                id: HashIdHelper.generateHash(task.id),
+                userId: HashIdHelper.generateHash(task.userId)
             };
 
             res.json(responseData);
@@ -70,7 +72,8 @@ class ToDoController {
             // Маскируем ID через деструктуризацию
             const responseData = {
                 ...task,
-                id: HashIdHelper.generateHash(task.id)
+                id: HashIdHelper.generateHash(task.id),
+                userId: HashIdHelper.generateHash(task.userId),
             };
 
             res.json(responseData);
@@ -96,7 +99,8 @@ class ToDoController {
             // Маскируем ID через деструктуризацию
             const responseData = {
                 ...updatedTask,
-                id: HashIdHelper.generateHash(updatedTask.id)
+                id: HashIdHelper.generateHash(updatedTask.id),
+                userId: HashIdHelper.generateHash(updatedTask.userId)
             };
 
             res.json(responseData);
@@ -123,7 +127,8 @@ class ToDoController {
             // Маскируем ID через деструктуризацию
             const responseData = {
                 ...deletedTask,
-                id: HashIdHelper.generateHash(deletedTask.id)
+                id: HashIdHelper.generateHash(deletedTask.id),
+                userId: HashIdHelper.generateHash(deletedTask.userId)
             };
 
             res.json(responseData);

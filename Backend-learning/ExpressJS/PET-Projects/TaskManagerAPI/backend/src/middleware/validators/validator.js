@@ -41,11 +41,14 @@ const validator = (schema) => (req, res, next) => {
         // parse() проверяет req.body. Если данные плохие — вызовет ошибку.
         schema.parse(req.body);
         next(); // Если все ОК, то передаем управление к контроллеру
-    } catch (error) {
-        // Если Zod нашел ошибки, мы форматируем их и отправляем статус 400 (Bad Request)
-        const errorMessage = error.errors.map(error => error.message).join(', ');
+    }  catch (error) {
+    if (error.errors) {
+        const errorMessage = error.errors.map(e => e.message).join(', ');
         next(new BadRequestError(errorMessage));
+    } else {
+        next(error); // пробрасываем дальше если это не ZodError
     }
+}
 }
 
 module.exports = { validator, toDoSchema, registerSchema };
