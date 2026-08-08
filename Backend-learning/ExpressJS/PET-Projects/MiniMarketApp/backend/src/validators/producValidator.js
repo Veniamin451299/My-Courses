@@ -1,0 +1,1 @@
+// path: backend/src/validators/productValidator.js

@@ -1,4 +1,4 @@
-// path: backend/src/middlewares/errorHandler.js
+// path: backend/src/middlewares/errors/errorHandler.js
 class BadRequestError extends Error {
   constructor(message) {
     super(message);

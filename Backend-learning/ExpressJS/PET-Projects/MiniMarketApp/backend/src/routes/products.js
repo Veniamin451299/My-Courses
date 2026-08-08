@@ -1,0 +1,1 @@
+// path: backend/src/routes/products.js

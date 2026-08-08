@@ -1,6 +1,6 @@
 const express = require('express');
 const config = require('./config/env');
-const errorHandler = require('./middlewares/errorResponse');
+const errorHandler = require('./middlewares/errors/errorResponse');
 const helmet = require('helmet');
 const router = require('./routes');
 const redis = require('./config/redis');

@@ -1,0 +1,1 @@
+// path: backend/src/controllers/productController.js

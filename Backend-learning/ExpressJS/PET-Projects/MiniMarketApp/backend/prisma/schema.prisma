@@ -1,0 +1,131 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+
+model User {
+  id              Int      @id @default(autoincrement())
+  email           String   @unique
+  passwordHash    String
+  name            String?
+  role            String   @default("CUSTOMER")
+  cart            Cart?
+  orders          Order[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Cart {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @unique
+  user         User     @relation(fields: [userId], references: [id])
+  items        CartItem[]
+  totalPrice   Decimal  @default(0)
+  updatedAt    DateTime @updatedAt
+
+  @@map("carts")
+}
+
+model CartItem {
+  id            Int     @id @default(autoincrement())
+  cartId        Int
+  cart          Cart    @relation(fileds: [cartId], references: [id])
+  productId     Int
+  product       Product @relation(fileds: [productId], references: [id])
+  quantity      Int     @default(1)
+  price         Decimal // Цена на момент добавления
+
+  @@unique([cartId, productId])
+  @@map("cart_items")
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Decimal
+  stock       Int       @default(0) // Количество на складе
+  images      String[]  // URLs на изображения
+  categoryId  Int
+  category    Category @relation(fileds: [categoryId], references: [id])
+  isAcrive    Boolean   @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("products")
+}
+
+model Category {
+  id         Int      @id @default(autoincrement())
+  name       String   @unique
+  description String?
+  products   Product[]
+
+  @@map("categories")
+}
+
+model Order {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @unique
+  user       User     @relation(fileds: [userId], references: [id])
+  items      OrderItem[]
+  totalPrice Decimal
+  status     orderStatus @default(PENDING)
+  paymentId  String?  // ID платежа в платежной системы
+  address    json     // { city: string, street: string, house: string, apartment: string }
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id         Int        @id @default(autoincrement())
+  orderId    Int
+  order      Order      @relation(fields: [orderId], references: [id])    
+  productId  Int
+  product    Product    @relation(fields: [productId], references: [id])
+  quantity   Int
+  price      Decimal    // Цена на момент заказа
+
+  @@map("order_items")
+}
+
+model Analytics {
+  id         Int        @id @default(autoincrement())
+  event      String     // page_view, product_view, add_to_cart, purchase
+  userId     Int?
+  productId  Int?
+  sessionId  String
+  ip         String?
+  userAgent  String?
+  metadata   Json       // Дополнительные данные
+  createdAt  DateTime   @default(now())
+
+  @@map("analytics")
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  DELIVERED
+  CANCELED
+}

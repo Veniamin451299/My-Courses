@@ -42,3 +42,58 @@
 1. Создай новую папку для проекта (например, `mini-market-api`).
 2. Перенеси туда каркас.
 3. Обнови файл `schema.prisma`, описав три новые модели (`User`, `Product`, `CartItem`) и запусти миграцию `npx prisma migrate dev`.
+
+Последовательность команд:
+bash
+
+# 1. Создаем папку и инициализируем npm
+mkdir my-project
+cd my-project
+npm init -y           # создает package.json
+
+# 2. Устанавливаем базовые зависимости
+npm install express dotenv helmet
+
+# 3. Устанавливаем dev-зависимости
+npm install -D nodemon jest supertest
+
+# 4. (Опционально) Устанавливаем TypeScript
+npm install -D typescript @types/node
+npx tsc --init
+
+Базовый package.json для Express проекта:
+json
+
+{
+  "name": "minimarket-api",
+  "version": "1.0.0",
+  "description": "E-commerce API",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "jest",
+    "lint": "eslint src/**/*.js"
+  },
+  "dependencies": {
+    "express": "^4.18.0",
+    "dotenv": "^16.0.0",
+    "helmet": "^7.0.0",
+    "prisma": "^5.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0",
+    "jest": "^29.0.0",
+    "supertest": "^6.0.0"
+  }
+}
+
+Важно для твоего портфолио:
+
+    package-lock.json - всегда коммитить в репозиторий
+
+    node_modules - всегда в .gitignore
+
+    npm ci - используется в CI/CD вместо npm install (быстрее и надежнее)
+
+Краткий ответ: npm init -y → потом npm install [пакеты] → профит 🚀

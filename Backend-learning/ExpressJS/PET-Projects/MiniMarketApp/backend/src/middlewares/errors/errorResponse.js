@@ -1,4 +1,4 @@
-// path: backend/src/middlewares/errorResponse.js
+// path: backend/src/middlewares/errors/errorResponse.js
 
 module.exports = (err, req, res, next) => {
   const statusCode = err.statusCode || 500;
