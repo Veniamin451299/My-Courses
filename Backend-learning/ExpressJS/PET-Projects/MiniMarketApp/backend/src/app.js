@@ -4,12 +4,17 @@ const errorHandler = require('./middlewares/errors/errorResponse');
 const helmet = require('helmet');
 const router = require('./routes');
 const redis = require('./config/redis');
+const pino = require('./config/logger');
+const limiter = require('./middlewares/rateLimiter');
 
 const app = express();
 let server = null;
 
 app.use(express.json());
 app.use(helmet());
+app.use(pino());
+app.use(limiter);
+
 
 // Логирование запросов в devmode
 if (config.nodeEnv === 'development') {
