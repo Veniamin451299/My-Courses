@@ -8,6 +8,7 @@ const schema = Joi.object({
   REDIS_URL: Joi.string().required(),
   JWT_SECRET: Joi.string().min(32).required(),
   HASHID_SALT: Joi.string().min(10).required(),
+  LOG_LEVEL: Joi.string().default('info'),
   ADMIN_EMAIL: Joi.string().email().required(),
   ADMIN_PASSWORD: Joi.string().min(8).required(),
 }).unknown();
