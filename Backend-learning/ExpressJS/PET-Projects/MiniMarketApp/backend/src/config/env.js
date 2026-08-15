@@ -1,5 +1,7 @@
 // path: backend/src/config/env.js
 const Joi = require('joi');
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 
 const schema = Joi.object({
   PORT: Joi.number().default(3000),

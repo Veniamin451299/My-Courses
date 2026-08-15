@@ -1,5 +1,5 @@
 // path: backend/src/middlewares/logger.js
-const logger = require('./config/logger');
+const logger = require('../config/logger');
 
 const requestLogger = (req, res, next) => {
     const start = Data.now();

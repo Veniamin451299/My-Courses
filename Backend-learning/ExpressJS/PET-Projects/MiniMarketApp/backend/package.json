@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "E-commerce API",
   "main": "src/app.js",
-  "type": "module",
   "prisma": {
     "seed": "node --experimental-detect-module prisma/seed.js"
   },
@@ -11,31 +10,35 @@
     "test": "tests"
   },
   "scripts": {
+    "start": "node src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "pino": "^10.3.1",
-    "prisma": "^7.9.1",
     "@prisma/adapter-pg": "^7.9.1",
-    "@prisma/client": "^7.9.0",
+    "@prisma/client": "^7.9.1",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.6.2",
     "hashids": "^2.3.0",
     "helmet": "^8.3.0",
-    "pg": "^8.22.0",
-    "redis": "^6.2.0"
+    "joi": "^18.2.3",
+    "pg": "^8.23.0",
+    "pino": "^10.3.1",
+    "pino-pretty": "^13.1.3",
+    "prisma": "^7.9.1",
+    "redis": "^6.2.1"
   },
   "devDependencies": {
     "@types/node": "^26.2.0",
     "jest": "^30.4.2",
     "nodemon": "^3.1.14",
+    "prisma": "^7.8.0",
     "supertest": "^7.2.2",
     "ts-node": "^10.9.2",
     "tsx": "^4.23.12",
-    "typescript": "^7.0.2",
-    "prisma": "^7.8.0"
+    "typescript": "^7.0.2"
   }
 }
