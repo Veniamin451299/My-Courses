@@ -4,17 +4,15 @@ const errorHandler = require('./middlewares/errors/errorResponse');
 const helmet = require('helmet');
 const router = require('./routes');
 const redis = require('./config/redis');
-const pino = require('./config/logger');
-const limiter = require('./middlewares/rateLimiter');
+const logger = require('./config/logger'); 
+const { limiter } = require('./middlewares/rateLimiter');
 
 const app = express();
 let server = null;
 
 app.use(express.json());
 app.use(helmet());
-app.use(pino());
 app.use(limiter);
-
 
 // Логирование запросов в devmode
 if (config.nodeEnv === 'development') {
@@ -59,7 +57,6 @@ async function startServer() {
 const handleServerShutdown = async (signal) => {
     console.log(`\nReceived ${signal}. Shutting down server...`);
 
-    // Проверяем, запущен ли сервер
     if (server && server.listening) {
         try {
             await new Promise((resolve, reject) => {
@@ -70,13 +67,12 @@ const handleServerShutdown = async (signal) => {
             });
             console.log('Server connection closed gracefully.');
         } catch (err) {
-            console.error('Error during server close:', error);
+            console.error('Error during server close:', err);
         }
     } else {
         console.log('Server was not active, skipping socket close.');
     }
 
-    // Закрываем соединение с Redis, если оно активно
     if (redis && redis.isOpen) {
         try {
             await redis.quit();
@@ -89,7 +85,6 @@ const handleServerShutdown = async (signal) => {
     process.exit(0);
 };
 
-// Обработка сигналов завершения
 process.on('SIGINT', () => handleServerShutdown('SIGINT'));
 process.on('SIGTERM', () => handleServerShutdown('SIGTERM'));
 

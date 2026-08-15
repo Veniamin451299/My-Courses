@@ -4,8 +4,6 @@ const JWTService = require('../utils/jwt');
 const { UnauthorizedError, BadRequestError } = require('../middlewares/errors/errorHandler');
 const { hash, compare } = require('../utils/bcrypt');
 const hashedId = require('../utils/hashid');
-const redis = require('../config/redis');
-const { ca } = require('zod/locales');
 
 class AuthController { 
     /** Register user
@@ -118,7 +116,10 @@ class AuthController {
      * **/
     async me(req, res, next) { 
         try {
-            const user = await userService.findUserById(req.user.id);
+            const decodedId = HashId.decodeHash(req.user.id);
+            if (!decodedId) return next(new BadRequestError("Invalid user id"));
+
+            const user = await userService.findUserById(decodedId);
             if (!user) return next(new UnauthorizedError("Invalid user"));
 
             res.json({

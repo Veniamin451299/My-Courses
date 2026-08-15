@@ -1,6 +1,7 @@
 // path: backend/src/routes/index.js
 const router = require('express').Router();
 const authRouter = require('./auth');
+const productRouter = require('./products');
 
 router.use('/health', (_req, res) => {
     res.json({
@@ -13,5 +14,6 @@ router.use('/health', (_req, res) => {
 });
 
 router.use('/auth', authRouter);
+router.use('/products', productRouter);
 
 module.exports = router;

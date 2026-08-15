@@ -97,3 +97,53 @@ json
     npm ci - используется в CI/CD вместо npm install (быстрее и надежнее)
 
 Краткий ответ: npm init -y → потом npm install [пакеты] → профит 🚀
+
+
+#s Бизнес-логика (ключевые эндпоинты)
+## 4.1. Авторизация
+```text
+
+POST /api/auth/register
+POST /api/auth/login
+POST /api/auth/refresh
+POST /api/auth/logout
+GET  /api/auth/me (требуется авторизация
+```
+
+## 4.2. Товары
+```text
+
+GET    /api/products (пагинация, фильтры, поиск)
+GET    /api/products/:id
+POST   /api/products (ADMIN)
+PUT    /api/products/:id (ADMIN)
+DELETE /api/products/:id (ADMIN)
+GET    /api/products/categories
+```
+
+## 4.3. Корзина
+```text
+
+GET    /api/cart (требуется авторизация)
+POST   /api/cart/items (добавить товар)
+PUT    /api/cart/items/:productId (изменить количество)
+DELETE /api/cart/items/:productId (удалить)
+DELETE /api/cart (очистить)
+```
+
+## 4.4. Заказы
+```text
+
+POST   /api/orders (создать из корзины)
+GET    /api/orders (история заказов)
+GET    /api/orders/:id
+PUT    /api/orders/:id/status (ADMIN)
+```
+
+## 4.5. Аналитика
+```text
+
+GET /api/analytics/popular-products (ADMIN)
+GET /api/analytics/revenue (ADMIN)
+GET /api/analytics/user-stats (ADMIN)
+```
