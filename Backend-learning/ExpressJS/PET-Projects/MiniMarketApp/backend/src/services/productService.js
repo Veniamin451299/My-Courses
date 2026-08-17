@@ -17,13 +17,9 @@ class ProductService {
         const skip = (page - 1) * limit;
         const take = limit;
 
-        // Проверяем кеш
-        try {
-            const cached = await cache.get(cacheKey);
-            if (cached) return JSON.parse(cached);
-        } catch (redisError) {
-            logger.error({ error: redisError }, 'Redis GET error');
-        }
+
+        const cachedResult = await cache.get(cacheKey);
+        if (cachedResult) return cachedResult;
 
         // Собираем фильтры
         const where = {};
@@ -48,14 +44,7 @@ class ProductService {
         };
 
         // Сохраняем в кеш (только если есть продукты)
-        if (products.length > 0) {
-            try {
-                await cache.set(cacheKey, JSON.stringify(result), { EX: 3600 });
-            } catch (redisError) {
-                logger.error({ error: redisError }, 'Redis SET error');
-            }
-        }
-
+        if (products.length > 0) await cache.set(cacheKey, result);
         return result;
     };
 
@@ -65,22 +54,13 @@ class ProductService {
      * **/
     async getProductById(productId) {
         const cacheKey = `product:${productId}`;
-        let product = null;
+        let product = await cache.get(cacheKey);
 
-        try {
-            product = await cache.get(cacheKey);
-        } catch (redisError) {
-            logger.error({ error: redisError }, 'Redis (GET) product error');
-        }
+        if (!product) {
+            product = await productRepo.findById(productId);
 
-        if (product) return JSON.parse(product);
-        product = await productRepo.findById(productId);
-
-        if (product) {
-             try {
-                await cache.set(cacheKey, JSON.stringify(product), {EX: 3600});
-            } catch (redisError) {
-                logger.error({ error: redisError }, 'Redis (SET) product error');
+            if (product && product.length > 0) {
+                await cache.set(cacheKey, product);
             }
         }
         return product;
@@ -96,11 +76,7 @@ class ProductService {
         const category = await productRepo.findById(productData.categoryId);
         if (!category) throw new NotFoundError('Category not found');
         // Инвалидация кэша
-        try {
-            await cache.delPattern('products:*');
-        } catch (redisError) {
-            logger.error({error: redisError}, 'Redis (DEL) product create error');
-        }
+        await cache.delPattern(`products:*`);
         return createProduct;
     }
 
@@ -113,14 +89,9 @@ class ProductService {
     async updateProduct(productId, productData) { 
         try {
             const updatedProduct = await productRepo.update(productId, productData)
-            
             // Инвалоидируем кэш
-            try {
-                await cache.delPattern(`products:*`); // Удаляем все списки
-                await cache.del(`product:${productId}`); // Улаляем конкретный продукт
-            } catch (redisError) {
-                logger.error({error: redisError}, 'Redis (DEL) product update error');
-            }
+            await cache.delPattern(`products:*`); // Удаляем все списки
+            await cache.del(`product:${productId}`); // Улаляем конкретный продукт
             return updatedProduct;
         } catch (err) {
             if (err.code === 'P2025') {
@@ -137,13 +108,8 @@ class ProductService {
     async deleteProduct(productId) {
         try{
             const deletedProduct = await productRepo.delete(productId);
-        
             // Инвалидируем кэш
-            try {
-                await cache.delPattern(`products:*`);
-            } catch (redisError) {
-                logger.error({error: redisError}, 'Redis DEL product delete error');
-            }
+            await cache.delPattern(`products:*`);
             return deletedProduct;
         } catch (err) {
             if (err.code === 'P2025') {

@@ -1,13 +1,14 @@
 // utils/cache.js
 const redis = require('../config/redis');
+const logger = require('../config/logger');
 
 class CacheService {
   async get(key) {
     try {
       const data = await redis.get(key);
       return data ? JSON.parse(data) : null;
-    } catch (error) {
-      console.error('Redis GET error:', error);
+    } catch (redisError) {
+      logger.error({error: redisError}, 'Redis GET error');
       return null;
     }
   }
@@ -15,16 +16,16 @@ class CacheService {
   async set(key, value, ttl = 3600) {
     try {
       await redis.set(key, JSON.stringify(value), { EX: ttl });
-    } catch (error) {
-      console.error('Redis SET error:', error);
+   } catch (redisError) {
+      logger.error({error: redisError}, 'Redis SET error');
     }
   }
 
   async del(key) {
     try {
       await redis.del(key);
-    } catch (error) {
-      console.error('Redis DEL error:', error);
+    } catch (redisError) {
+      logger.error({error: redisError}, 'Redis DEL error');
     }
   }
 
@@ -34,8 +35,8 @@ class CacheService {
       if (keys.length > 0) {
         await redis.del(keys);
       }
-    } catch (error) {
-      console.error('Redis DEL pattern error:', error);
+   } catch (redisError) {
+      logger.error({error: redisError}, 'Redis DEL pattern error');
     }
   }
 }
