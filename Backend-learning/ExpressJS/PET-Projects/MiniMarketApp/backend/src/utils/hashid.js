@@ -16,6 +16,17 @@ class HashId {
         if(!hash) return null;
         return this.hashids.decode(hash)[0];
     }
+    // Функция для преобразования корзины
+    transformCart = (cart) => ({
+        ...cart,
+        id: hashId.generateHash(cart.id),
+        userId: hashId.generateHash(cart.userId),
+        items: cart.items.map(item => ({
+            ...item,
+            id: hashId.generateHash(item.id),
+            productId: hashId.generateHash(item.productId)
+        }))
+    });
 }
 
 module.exports = new HashId();

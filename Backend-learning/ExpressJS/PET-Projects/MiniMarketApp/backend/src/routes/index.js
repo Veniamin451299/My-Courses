@@ -2,6 +2,7 @@
 const router = require('express').Router();
 const authRouter = require('./auth');
 const productRouter = require('./products');
+const cartRouter = require('./cart');
 
 router.use('/health', (_req, res) => {
     res.json({
@@ -15,5 +16,6 @@ router.use('/health', (_req, res) => {
 
 router.use('/auth', authRouter);
 router.use('/products', productRouter);
+router.use('/cart', cartRouter);
 
 module.exports = router;
