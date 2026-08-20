@@ -5,6 +5,7 @@ const cartItemRepo = require('../repositories/cartItemRepository');
 const productRepo = require('../repositories/productRepository');
 const { NotFoundError, BadRequestError } = require('../middlewares/errors/errorHandler');
 const prisma = require('../config/prisma');
+const analyticsRepo = require('../repositories/analyticsRepository');
 
 class OrderService {
     /** GET method
@@ -71,14 +72,19 @@ class OrderService {
 
 
         // 6. Log event
-        // await tx.analytics.create({
-        // data: {
-        //     event: 'purchase',
-        //     userId,
-        //     metadata: { orderId: order.id, total: order.total }
-        // }
-        // });
-
+        for (const item of cart.items) {
+             await analyticsRepo.createEventAnalytics(tx, {
+                event: 'purchase',
+                userId,
+                productId: item.productId,
+                metadata: {
+                    orderId: order.id,
+                    quantity: item.quantity,
+                    price: item.price
+                }
+            });
+        }
+       
         return order;
       });
     };

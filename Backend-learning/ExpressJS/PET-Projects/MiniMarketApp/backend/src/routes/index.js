@@ -4,6 +4,7 @@ const authRouter = require('./auth');
 const productRouter = require('./products');
 const cartRouter = require('./cart');
 const orderRouter = require('./orders');
+const analyticsRouter = require('./analytics');
 
 router.use('/health', (_req, res) => {
     res.json({
@@ -19,5 +20,6 @@ router.use('/auth', authRouter);
 router.use('/products', productRouter);
 router.use('/cart', cartRouter);
 router.use('/orders', orderRouter);
+router.use('/analytics', analyticsRouter);
 
 module.exports = router;
