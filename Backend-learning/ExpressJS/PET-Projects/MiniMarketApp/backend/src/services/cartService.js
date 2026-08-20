@@ -1,6 +1,7 @@
 // path: backend/src/services/cartService.js
 const cartRepo = require('../repositories/cartRepository');
 const productRepo = require('../repositories/productRepository');
+const cartItemRepo = require('../repositories/cartItemRepository');
 const prisma = require('../config/prisma');
 const { NotFoundError } = require('../middlewares/errors/errorHandler');
 
@@ -44,7 +45,7 @@ class CartService {
                 });
             }
             // 4. Recalculate total price
-            const items = await tx.cartItem.findMany({ where: { cartId: cart.id } });
+            const items = await cartItemRepo.findCartItemByCartId(tx, cart.id);
             const totalPrice = items.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
             await cartRepo.updateCartTotal(tx, cart.id, totalPrice);
             // 5. Return the updated cart to the user
@@ -68,7 +69,7 @@ class CartService {
             
             await cartRepo.updateCartItem(tx, cartItemId, newQuantity);
             // Recalculate total price
-            const items = await tx.cartItem.findMany({ where: { cartId: cart.id } });
+            const items = await cartItemRepo.findCartItemByCartId(tx, cart.id);
             const totalPrice = items.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
             await cartRepo.updateCartTotal(tx, cart.id, totalPrice);
             return await cartRepo.findCartByUserId(tx, userId);
@@ -89,7 +90,7 @@ class CartService {
 
             await cartRepo.deleteCartItem(tx, cartItemId);
             // Recalculate total price
-            const items = await tx.cartItem.findMany({ where: { cartId: cart.id } });
+            const items = await cartItemRepo.findCartItemByCartId(tx, cart.id);
             const totalPrice = items.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
             await cartRepo.updateCartTotal(tx, cart.id, totalPrice);
             return await cartRepo.findCartByUserId(tx, userId);
