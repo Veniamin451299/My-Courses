@@ -27,6 +27,18 @@ class HashId {
             productId: hashId.generateHash(item.productId)
         }))
     });
+
+    // Функция для преобразования заказа
+    transformOrder = (order) => ({
+        ...order,
+        id: hashId.generateHash(order.id),
+        userId: hashId.generateHash(order.userId),
+        items: order.items.map(item => ({
+            ...item,
+            id: hashId.generateHash(item.id),
+            productId: hashId.generateHash(item.productId)
+        }))
+    });
 }
 
 module.exports = new HashId();

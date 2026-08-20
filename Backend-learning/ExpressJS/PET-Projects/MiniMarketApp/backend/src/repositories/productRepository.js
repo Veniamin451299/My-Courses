@@ -23,6 +23,10 @@ class ProductRepository {
     return prisma.product.update({ where: { id: id }, data: data });
   }
 
+  async decrimentStock(client, id, quantity) {
+    return client.product.update({ where: { id: id }, data: { stock: { decrement: quantity } } });
+  }
+
   async delete(id) {
     return prisma.product.delete({ where: { id: id } });
   }
