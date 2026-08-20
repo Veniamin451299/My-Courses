@@ -2,7 +2,8 @@
 const productRepo = require('../repositories/productRepository');
 const cache = require('../utils/cache');
 const logger = require('../config/logger');
-const { NotFoundError } = require('../middlewares/errors/errorHandler')
+const { NotFoundError } = require('../middlewares/errors/errorHandler');
+const prisma = require('../config/prisma');
 
 class ProductService {
     /** Method GET all products
@@ -57,7 +58,7 @@ class ProductService {
         let product = await cache.get(cacheKey);
 
         if (!product) {
-            product = await productRepo.findById(productId);
+            product = await productRepo.findById(prisma, productId);
 
             if (product && product.length > 0) {
                 await cache.set(cacheKey, product);
@@ -118,6 +119,6 @@ class ProductService {
             throw err; 
         }
     };
-}
+} 
 
 module.exports = new ProductService;

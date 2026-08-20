@@ -2,6 +2,7 @@
 const prisma = require('../config/prisma');
 
 class ProductRepository {
+  // @param: client - {prisma, tx}
   async findAll({ skip, take, where, orderBy }) {
     return prisma.product.findMany({ skip, take, where, orderBy });
   }
@@ -10,8 +11,8 @@ class ProductRepository {
     return prisma.product.count({ where });
   }
 
-  async findById(id) {
-    return prisma.product.findUnique({ where: { id: id   } });
+  async findById(client, id) {
+    return client.product.findUnique({ where: { id: id } });
   }
 
   async create(data) {
