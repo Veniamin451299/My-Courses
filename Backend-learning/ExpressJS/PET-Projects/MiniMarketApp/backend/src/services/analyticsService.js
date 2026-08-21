@@ -28,8 +28,8 @@ class AnalyticsService {
 
     const productsWithRank = topProducts.map((item, index) => ({
         ...item,
-        rank = index + 1,
-        precentage = (item.count / totalPurchase * 100) 
+        rank: index + 1,
+        precentage: totalPurchase > 0 ? (item.count / totalPurchase) * 100 : 0, 
     })); 
     
     return {

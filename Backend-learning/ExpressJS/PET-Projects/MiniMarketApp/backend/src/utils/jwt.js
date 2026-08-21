@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 
 class JWTService { 
     generateToken(userId, role, expire) {
-        return jwt.sign({ userId, role }, process.env.JWT_SECRET, { expiresIn: expire || '7d' });
+        return jwt.sign({ id: userId, role }, process.env.JWT_SECRET, { expiresIn: expire || '7d' });
     }
 
     verifyToken(token) {

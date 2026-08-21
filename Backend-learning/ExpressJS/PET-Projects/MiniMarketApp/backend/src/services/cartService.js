@@ -62,9 +62,6 @@ class CartService {
     async updateItemQuantity(userId, cartItemId, newQuantity) {
         return await prisma.$transaction(async (tx) => {
             const cart = await cartRepo.findCartByUserId(tx, userId);
-            if(!cart) throw new NotFoundError('Cart not found'); 
-
-            const cart = await cartRepo.findCartByUserId(tx, userId);
             if(!cart || cartItem.cartId !== cart.id) throw new NotFoundError('Cart not found');
             
             await cartRepo.updateCartItem(tx, cartItemId, newQuantity);
