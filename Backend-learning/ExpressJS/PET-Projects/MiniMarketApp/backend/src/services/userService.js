@@ -1,36 +1,50 @@
 // path: backend/src/services/userService.js
 const prisma = require('../config/prisma');
 const cache = require('../utils/cache');
+const logger = require('../config/logger');
 
 class UserService {
     // GET: find user by email
     async findByEmail(email) {
-        return await prisma.user.findUnique({ where: { email } });
+        return await prisma.user.findUnique({ where: {email: email } });
     }
 
     // GET: find user by id
     async findUserById(id) {
-        return await prisma.user.findUnique({ where: { id } });
+        return await prisma.user.findUnique({ where: {id: id } });
     }
 
     // POST: create user
     async createUser(email, hashedPassword) {
-        return await prisma.user.create({ data: { email, passwordHash: hashedPassword } });
+        return await prisma.user.create({ data: { email: email, passwordHash: hashedPassword } });
     }
 
     // Save refresh token
     async saveRefreshToken(userId, refreshToken) {
-        await cache.set(`refresh:${userId}`, refreshToken, 'EX', 7 * 24 * 60 * 60);
+        try {
+            await cache.set(`refresh:${userId}`, refreshToken, 7 * 24 * 60 * 60 );
+        } catch (redisErr) {
+            logger.error({error: redisErr}, 'Redis SET error in saveRefreshToken');
+        }
     }
 
     // Get refresh token
     async getRefreshToken(userId) {
-        return await cache.get(`refresh:${userId}`);
+        try {
+            return await cache.get(`refresh:${userId}`);
+        } catch (redisErr) {
+            logger.error({error: redisErr}, 'Redis GET error in getRefreshToken');
+            return null;
+        }
     }
 
     // Delete refresh token
     async deleteRefreshToken(userId) {
-        await cache.del(`refresh:${userId}`);
+        try {
+            await cache.del(`refresh:${userId}`);
+        } catch (redisErr) {
+            logger.error({error: redisErr}, 'Redis DEL error in deleteRefreshToken');
+        }
     }
 }
 

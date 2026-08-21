@@ -1,12 +1,4 @@
 // path: backend/src/middlewares/errors/errorHandler.js
-class BadRequestError extends Error {
-  constructor(message) {
-    super(message);
-    this.name = 'BadRequestError';
-    this.statusCode = 400;
-  }
-}
-
 class UnauthorizedError extends Error {
   constructor(message) {
     super(message);
@@ -31,11 +23,11 @@ class NotFoundError extends Error {
   }
 }
 
-class InternalServerError extends Error {
+class BadRequestError extends Error {
   constructor(message) {
     super(message);
-    this.name = 'InternalServerError';
-    this.statusCode = 500;
+    this.name = 'BadRequestError';
+    this.statusCode = 400;
   }
 }
 
@@ -44,5 +36,4 @@ module.exports = {
   UnauthorizedError,
   ForbiddenError,
   NotFoundError,
-  InternalServerError,
 };

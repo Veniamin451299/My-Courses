@@ -1,6 +1,7 @@
 // path: backend/src/middlewares/auth.js
 const { UnauthorizedError, ForbiddenError } = require("./errors/errorHandler");
 const jwtService = require("../utils/jwt");
+const hashId = require('../utils/hashid'); 
 
 // Token verification
 const authMiddleware = (req, _res, next) => { 
@@ -10,7 +11,11 @@ const authMiddleware = (req, _res, next) => {
     const decoded = jwtService.verifyToken(token);
     if (!decoded) return next(new UnauthorizedError("Invalid token"));
      
-    req.user = decoded;
+    req.user = {
+        id: decoded.id,              // Оригинальный ID (для БД)
+        hashedId: hashId.generateHash(decoded.id), // Хэшированный (для ответов)
+        role: decoded.role
+    };
     next();
 }
 
