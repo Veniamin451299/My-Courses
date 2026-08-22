@@ -1,10 +1,10 @@
 // backend/prisma/seed.js
 const dotenv =  require('dotenv/config');
 const { PrismaPg } = require('@prisma/adapter-pg');
-const { pg } = require('pg');
+const { Pool } = require('pg');
 const { PrismaClient } = require('@prisma/client'); 
 
-const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
