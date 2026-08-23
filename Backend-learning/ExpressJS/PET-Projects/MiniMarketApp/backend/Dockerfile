@@ -9,9 +9,7 @@ COPY package*.json ./
 RUN npm ci --only=production
 # 5. Копируем весь код кроме файла .dockerignore
 COPY . .
-# 6. Генерируем Prisma CLient
-RUN npx prisma generate
-# 7. Указываем порт
+# 6. Указываем порт
 EXPOSE 3000
-# 8. Команда для запуска
-CMD ["node", "src/server.js"]
+# 7. Команда для запуска
+CMD ["sh", "-c", "npx prisma generate && node src/server.js"]

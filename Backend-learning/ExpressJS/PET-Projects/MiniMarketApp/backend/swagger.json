@@ -1,0 +1,504 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "Mini Market API",
+    "description": "PET-Project с сервером написанным на Express.js.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Health",
+      "description": "Операция отклика сервера"
+    },
+    {
+      "name": "User",
+      "description": "Операции с пользователем"
+    },
+    {
+      "name": "Products",
+      "description": "Операции с товарами"
+    },
+    {
+      "name": "Category",
+      "description": "Опарации с категориями (АДМИН)"
+    },
+    {
+      "name": "Cart",
+      "description": "Операции с корзиной пользователя"
+    },
+    {
+      "name": "Order",
+      "description": "Операции с заказами"
+    },
+    {
+      "name": "Analytics",
+      "description": "Операции с аналитикой (АДМИН)"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": ["Health"],
+        "summary": "Health запрос на отклик сервера",
+        "operationId": "getHealth",
+        "responses": {
+          "200": {
+            "description": "Health GET запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Регистрация пользователя",
+        "operationId": "registerUser",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Запрос выполнен успешно!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid input" },
+          "422": { "description": "Validation exception" },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Авторизация пользователя",
+        "operationId": "loginUser",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Запрос выполнен успешно!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid input" },
+          "401": { "description": "Unauthorizared error" },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Обновление токена из кэша",
+        "operationId": "refreshToken",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRefreshRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Запрос выполнен успешно!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRefreshResponse"
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid input" },
+          "401": { "description": "Unauthorizared error" },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Выход пользователя из аккаунта",
+        "operationId": "logoutUser",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLogoutRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Запрос выполнен успешно!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserLogoutResponse"
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid input" },
+          "401": { "description": "Unauthorized" },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Получить данные о себе",
+        "operationId": "getMe",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Запрос выполнен успешно!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid input" },
+          "401": { "description": "Unauthorizared error" },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Health": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "example": "(200) OK" },
+          "message": { "type": "string", "example": "Mini-market API server is running" },
+          "timestamp": { "type": "string", "example": "2026-08-23T19:40:49.385Z" },
+          "version": { "type": "string", "example": "1.0.0" },
+          "database": { "type": "string", "example": "PostgreSQL" }
+        }
+      },
+      "UserRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": { "type": "string", "example": "ivanov@email.com" },
+          "password": { "type": "string", "example": "12345678" }
+        }
+      },
+      "UserResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "email": { "type": "string", "example": "ivanov@email.com" },
+          "name": { "type": "string", "example": "Ivan" },
+          "role": {
+            "type": "string",
+            "enum": ["CUSTOMER", "ADMIN"],
+            "default": "CUSTOMER",
+            "example": "CUSTOMER"
+          },
+          "cart": { "$ref": "#/components/schemas/Cart" },
+          "orders": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Order" }
+          }
+        }
+      },
+      "UserRefreshRequest": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6IkNVU1RPTUVSIiwiaWF0IjoxNzg3NTE5ODQzLCJleHAiOjE3ODgxMjQ2NDN9.yPsiCSBaYALY7e-s8XO4772fy9DzKXoRMm8wlId2OpU"
+          }
+        }
+      },
+      "UserRefreshResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6IkNVU1RPTUVSIiwiaWF0IjoxNzg3NTE5ODQzLCJleHAiOjE3ODc1MjA3NDN9.Nytnfl0YWgACdIRFlrsJbT1JPMdiKGt4OCbyOzc4sEs"
+          },
+          "refreshToken": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6IkNVU1RPTUVSIiwiaWF0IjoxNzg3NTE5ODQzLCJleHAiOjE3ODgxMjQ2NDN9.yPsiCSBaYALY7e-s8XO4772fy9DzKXoRMm8wlId2OpU"
+          }
+        }
+      },
+      "UserLogoutRequest": {
+        "type": "object",
+        "properties": {}
+      },
+      "UserLogoutResponse": {
+        "type": "object",
+        "properties": {
+          "message": { "type": "string", "example": "Logout successfully" }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "required": ["name", "price", "stock", "images", "categoryId"],
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "name": { "type": "string", "example": "Молоко" },
+          "description": { "type": "string", "example": "Молоко \"Минская марка\" 0.75 л." },
+          "price": { "type": "number", "format": "float", "example": 2.35 },
+          "stock": { "type": "integer", "example": 20, "default": 0 },
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "https://images.pexels.com/photos/5946717/pexels-photo-5946717.jpeg"
+            }
+          },
+          "categoryId": { "type": "integer", "example": 1 },
+          "isActive": { "type": "boolean", "example": true, "default": true }
+        }
+      },
+      "Category": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "name": { "type": "string", "example": "food" },
+          "description": { "type": "string", "example": "Продукты питания" },
+          "products": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Product" }
+          }
+        }
+      },
+      "Cart": {
+        "type": "object",
+        "required": ["userId"],
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "userId": { "type": "integer", "example": 1 },
+          "totalPrice": { "type": "number", "format": "float", "example": 8.45 },
+          "items": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/CartItem" }
+          }
+        }
+      },
+      "CartItem": {
+        "type": "object",
+        "required": ["cartId", "productId", "price"],
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "cartId": { "type": "integer", "example": 1 },
+          "productId": { "type": "integer", "example": 1 },
+          "quantity": { "type": "integer", "example": 2, "default": 1 },
+          "price": { "type": "number", "format": "float", "example": 4.8 }
+        }
+      },
+      "Order": {
+        "type": "object",
+        "required": ["userId", "totalPrice", "address", "items"],
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "userId": { "type": "integer", "example": 1 },
+          "totalPrice": { "type": "number", "format": "float", "example": 4.8 },
+          "status": {
+            "type": "string",
+            "enum": ["PENDING", "PAID", "SHIPPED", "DELIVERED", "CANCELED"],
+            "default": "PENDING",
+            "example": "PENDING"
+          },
+          "paymentId": { "type": "string", "example": "e1824IW82364jw23819sae123" },
+          "address": { "$ref": "#/components/schemas/Order_address" },
+          "items": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/OrderItem" }
+          }
+        }
+      },
+      "OrderItem": {
+        "type": "object",
+        "required": ["orderId", "productId", "quantity", "price"],
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "orderId": { "type": "integer", "example": 1 },
+          "productId": { "type": "integer", "example": 1 },
+          "quantity": { "type": "integer", "example": 2 },
+          "price": { "type": "number", "format": "float", "example": 4.7 }
+        }
+      },
+      "Analytics": {
+        "type": "object",
+        "required": ["event", "sessionId", "metadata"],
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "event": { "type": "string", "example": "purchase" },
+          "userId": { "type": "integer", "example": 1 },
+          "productId": { "type": "integer", "example": 1 },
+          "sessionId": {
+            "type": "string",
+            "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+            "description": "ID сессии пользователя со стороны фронтенда"
+          },
+          "ip": { "type": "string", "example": "192.164.100.1" },
+          "userAgent": {
+            "type": "string",
+            "example": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "description": "Информация о браузере или устройстве пользователя"
+          },
+          "metadata": { "$ref": "#/components/schemas/Analytics_metadata" }
+        }
+      },
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "integer", "format": "int32" },
+          "type": { "type": "string" },
+          "message": { "type": "string" }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": ["code", "message"],
+        "properties": {
+          "code": { "type": "string" },
+          "message": { "type": "string" }
+        }
+      },
+      "Order_address": {
+        "type": "object",
+        "required": ["city", "street", "house"],
+        "properties": {
+          "city": { "type": "string", "example": "Minsk" },
+          "street": { "type": "string", "example": "Kazinca" },
+          "house": { "type": "string", "example": "23" },
+          "apartment": { "type": "string", "example": "45" }
+        }
+      },
+      "Analytics_metadata": {
+        "type": "object",
+        "properties": {
+          "orderId": { "type": "integer", "example": 1 },
+          "totalPrice": { "type": "number", "example": 4.7 }
+        },
+        "description": "Дополнительные данные о событии"
+      }
+    }
+  }
+}
