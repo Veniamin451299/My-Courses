@@ -37,7 +37,6 @@ class UserService {
             return null;
         }
     }
-
     // Delete refresh token
     async deleteRefreshToken(userId) {
         try {

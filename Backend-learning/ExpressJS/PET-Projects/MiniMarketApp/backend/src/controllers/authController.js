@@ -84,7 +84,7 @@ class AuthController {
         const decoded = JWTService.verifyToken(refreshToken);
         if (!decoded) return next(new UnauthorizedError("Invalid refresh token"));
 
-        const storedToken = await userService.getRefreshToken(decoded.userId);
+        const storedToken = await userService.getRefreshToken(decoded.id);
         if (storedToken !== refreshToken) return next(new UnauthorizedError("Invalid refresh token"));
 
         const newAccessToken = JWTService.generateToken(decoded.userId, decoded.role, "15m");
@@ -103,6 +103,7 @@ class AuthController {
      * **/
     async logout(req, res, next) { 
         try {
+            console.log(req.user.id);
             await userService.deleteRefreshToken(req.user.id);
             return res.status(200).json({ message: "Logout successfully" });
         } catch (err) {

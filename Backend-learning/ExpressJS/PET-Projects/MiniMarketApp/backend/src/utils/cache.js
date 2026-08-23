@@ -5,17 +5,22 @@ const logger = require('../config/logger');
 class CacheService {
   async get(key) {
     try {
-      const data = await redis.get(key);
-      return data ? JSON.parse(data) : null;
+        const data = await redis.get(key);
+        if (!data) return null;
+        try {
+            return JSON.parse(data);
+        } catch {
+            return data;
+        }
     } catch (redisError) {
-      logger.error({error: redisError}, 'Redis GET error');
-      return null;
+        logger.error({error: redisError}, 'Redis GET error');
+        return null;
     }
   }
 
   async set(key, value, ttl = 3600) {
     try {
-      await redis.set(key, JSON.stringify(value), { EX: ttl });
+      await redis.set(key, value, { EX: ttl });
    } catch (redisError) {
       logger.error({error: redisError}, 'Redis SET error');
     }
