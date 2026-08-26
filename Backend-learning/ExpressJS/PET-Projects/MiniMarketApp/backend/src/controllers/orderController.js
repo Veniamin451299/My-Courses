@@ -21,7 +21,7 @@ class OrderController {
                 message: "Get orders successfully", 
                 data: hashId.transformOrders(orders) });
         } catch (error) {
-            return next(new BadRequestError(`Internal Server Error: ${error.message}`));
+            return next(new BadRequestError(`Bad request error: ${error.message}`));
         }
     };
 
@@ -42,7 +42,7 @@ class OrderController {
                 message: "Get order successfully", 
                 data: hashId.transformOrder(order) });
         } catch (error) {
-            return next(new BadRequestError(`Internal Server Error: ${error.message}`));
+            return next(new BadRequestError(`Bad request error: ${error.message}`));
         }
     };
 
@@ -59,11 +59,11 @@ class OrderController {
             const order = await orderService.createOrder(decodedUserId);
             if (!order) return next(new NotFoundError('Order not found'));
 
-            return res.status(200).json({ 
+            return res.status(201).json({ 
                 message: "Create order successfully", 
                 data: hashId.transformOrder(order) });
         } catch (error) {
-            return next(new BadRequestError(`Internal Server Error: ${error.message}`));
+            return next(new BadRequestError(`Bad request error: ${error.message}`));
         }
     };
 
@@ -84,7 +84,7 @@ class OrderController {
                 message: "Update order successfully", 
                 data: hashId.transformOrder(order) });
         } catch (error) {
-            return next(new BadRequestError(`Internal Server Error: ${error.message}`));
+            return next(new BadRequestError(`Bad request error: ${error.message}`));
         }
     };
 }

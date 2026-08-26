@@ -18,7 +18,7 @@ class AnalyticsController {
                 data: eventAnalytics
             });
         } catch (error) {
-            return next(new BadRequestError(`Internal Server Error: ${error.message}`));
+            return next(new BadRequestError(`Bad request error: ${error.message}`));
         }
     };
 
@@ -36,7 +36,7 @@ class AnalyticsController {
                 data: topProducts
             });
         } catch (error) {
-            return next(new BadRequestError(`Internal Server Error: ${error.message}`));
+            return next(new BadRequestError(`Bad request error: ${error.message}`));
         }
     };
 
@@ -54,7 +54,7 @@ class AnalyticsController {
                 data: revenue
             });
         } catch (error) {
-            return next(new BadRequestError(`Internal Server Error: ${error.message}`));
+            return next(new BadRequestError(`Bad request error: ${error.message}`));
         }
      };
 
@@ -71,7 +71,7 @@ class AnalyticsController {
                 data: userStats
             });
         } catch (error) {
-            return next(new BadRequestError(`Internal Server Error: ${error.message}`));
+            return next(new BadRequestError(`Bad request error: ${error.message}`));
         }
      };
 }
