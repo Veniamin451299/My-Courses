@@ -6,4 +6,3 @@ node_modules
 .agents/
 .claude/
 .windsurf/
-prisma/migrations/*/
