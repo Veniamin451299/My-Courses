@@ -11,7 +11,7 @@ class CartController {
      * **/ 
     async getCart(req, res, next) {
         try {
-            const decodedUserId = hashId.decodeHash(req.user.id);
+            const decodedUserId = hashId.decodeHash(req.user.hashedId);
             if (!decodedUserId) return next(new BadRequestError('Invalid user id'));
 
             const cart = await cartService.getCart(decodedUserId);
@@ -32,7 +32,7 @@ class CartController {
      * **/ 
     async addItem(req, res, next) {
         try {
-            const decodedUserId = hashId.decodeHash(req.user.id);
+            const decodedUserId = hashId.decodeHash(req.user.hashedId);
             if (!decodedUserId) return next(new BadRequestError('Invalid user id'));
 
             const decodedProductId = hashId.decodeHash(req.body.productId);
@@ -56,10 +56,11 @@ class CartController {
      * **/ 
     async updateItemQuantity(req, res, next) {
         try {
-            const decodedUserId = hashId.decodeHash(req.user.id);
+            const decodedUserId = hashId.decodeHash(req.user.hashedId);
             if (!decodedUserId) return next(new BadRequestError('Invalid user id'));
 
-            const cartItemId = req.params.id;
+            const cartItemId = hashId.decodeHash(req.params.id);
+            if (!cartItemId) return next(new BadRequestError('Invalid cart item id'));
             const newQuantity = req.body.quantity;
 
             const updatedCart = await cartService.updateItemQuantity(decodedUserId, cartItemId, newQuantity);
@@ -80,10 +81,12 @@ class CartController {
      * **/
     async deleteCartItem(req, res, next) {
       try{
-        const decodedUserId = hashId.decodeHash(req.user.id);
+        const decodedUserId = hashId.decodeHash(req.user.hashedId);
         if (!decodedUserId) return next(new BadRequestError('Invalid user id'));
 
         const cartItemId = hashId.decodeHash(req.params.id);
+        if (!cartItemId) return next(new BadRequestError('Invalid cart item id'));
+        
         const deletedCart = await cartService.deleteCartItem(decodedUserId, cartItemId);
         if (!deletedCart) return next(new NotFoundError('Cart not found'));
 
@@ -103,7 +106,7 @@ class CartController {
      * **/
     async clearCart(req, res, next) {
         try {
-            const decodedUserId = hashId.decodeHash(req.user.id);
+            const decodedUserId = hashId.decodeHash(req.user.hashedId);
             if (!decodedUserId) return next(new BadRequestError('Invalid user id'));
 
             const clearCart = await cartService.clearCart(decodedUserId);

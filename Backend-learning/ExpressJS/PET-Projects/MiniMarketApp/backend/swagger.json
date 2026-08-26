@@ -630,10 +630,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Product"
-                  }
+                  "$ref": "#/components/schemas/inline_response_200"
                 }
               }
             }
@@ -855,6 +852,276 @@
           },
           "403": {
             "description": "Forbidden error"
+          },
+          "404": {
+            "description": "Not found error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/cart": {
+      "get": {
+        "tags": [
+          "Cart"
+        ],
+        "summary": "Получить корзину",
+        "description": "Отправляет GET запрос к БД, чтобы получить список товаров в корзине. \n\nНужна авторизация!",
+        "operationId": "getCart",
+        "responses": {
+          "200": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cart"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "401": {
+            "description": "Unauthorized error"
+          },
+          "404": {
+            "description": "Not found error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Cart"
+        ],
+        "summary": "Очистить корзину",
+        "description": "Отправляет DELETE запрос к БД, чтобы очистить корзину пользователя по ID пользователя. \n\nНужна авторизация!",
+        "operationId": "clearCart",
+        "responses": {
+          "200": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cart"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "401": {
+            "description": "Unauthorized error"
+          },
+          "404": {
+            "description": "Not found error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/cart/items": {
+      "post": {
+        "tags": [
+          "Cart"
+        ],
+        "summary": "Добавить в корзину",
+        "description": "Отправляет POST запрос к БД. Добавляет по ID пользователю, отправившего запрос, ID товара в корзину пользователя. Ищет корзину пользователя по ID, если нет - создает пользователю корзину. Если в корзине уже есть позиция с товаром - добавляет к количеству +1, если нет - создает позицию с товаром. Обновляется итоговая цена корзины \n\nНужна авторизация.",
+        "operationId": "addCartItem",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CartItemRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cart"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "401": {
+            "description": "Unauthorized error"
+          },
+          "404": {
+            "description": "Not found error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/cart/items/{id}": {
+      "put": {
+        "tags": [
+          "Cart"
+        ],
+        "summary": "Изменить количество товара в корзине",
+        "description": "Отправляет PUT запрос к БД. Изменяет количество товара в корзине пользователя по ID позиции корзины и новому количеству. Обновляется итоговая цена корзины. \n\nНужна авторизация.",
+        "operationId": "updateCartItemQuantity",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID позиции корзины",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "jgQoV28D"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CartItemUpdateItemRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cart"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "401": {
+            "description": "Unauthorized error"
+          },
+          "404": {
+            "description": "Not found error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Cart"
+        ],
+        "summary": "Удалить позицию из корзины",
+        "description": "Отправляет DELETE запрос к БД. Удаляет позицию из корзины пользователя по ID пользователя и позиции корзины. Обновляется итоговая цена корзины. \n\nНужна авторизация.",
+        "operationId": "deleteCartItem",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID позиции корзины",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "jgQoV28D"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cart"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "401": {
+            "description": "Unauthorized error"
           },
           "404": {
             "description": "Not found error"
@@ -1131,12 +1398,12 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "integer",
-            "example": 1
+            "type": "string",
+            "example": "1"
           },
           "userId": {
-            "type": "integer",
-            "example": 1
+            "type": "string",
+            "example": "1"
           },
           "totalPrice": {
             "type": "number",
@@ -1160,16 +1427,16 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "integer",
-            "example": 1
+            "type": "string",
+            "example": "1"
           },
           "cartId": {
-            "type": "integer",
-            "example": 1
+            "type": "string",
+            "example": "1"
           },
           "productId": {
-            "type": "integer",
-            "example": 1
+            "type": "string",
+            "example": "1"
           },
           "quantity": {
             "type": "integer",
@@ -1180,6 +1447,35 @@
             "type": "number",
             "format": "float",
             "example": 4.8
+          }
+        }
+      },
+      "CartItemRequest": {
+        "required": [
+          "cartId",
+          "productId"
+        ],
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "example": 2,
+            "default": 1
+          }
+        }
+      },
+      "CartItemUpdateItemRequest": {
+        "required": [
+          "quantity"
+        ],
+        "type": "object",
+        "properties": {
+          "quantity": {
+            "type": "integer",
+            "example": 2
           }
         }
       },
@@ -1376,6 +1672,37 @@
           }
         },
         "description": "Дополнительные данные о событии"
+      },
+      "inline_response_200": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Product"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/inline_response_200_pagination"
+          }
+        }
+      },
+      "inline_response_200_pagination": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "pages": {
+            "type": "integer"
+          }
+        }
       }
     },
     "securitySchemes": {

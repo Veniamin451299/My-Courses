@@ -1,5 +1,6 @@
 // path: backend/src/utils/hashid.js
 const HashIds = require('hashids/cjs');
+const { product } = require('../config/prisma');
 
 class HashId { 
     // Создаем экземпляр и передаем секретную соль
@@ -16,27 +17,37 @@ class HashId {
         if(!hash) return null;
         return this.hashids.decode(hash)[0];
     }
+
+    // Функция для преобразования продукта
+    transformProduct = (product) => ({
+        ...product,
+        id: this.generateHash(product.id),
+        categoryId: this.generateHash(product.categoryId)
+    });
+
     // Функция для преобразования корзины
     transformCart = (cart) => ({
         ...cart,
-        id: hashId.generateHash(cart.id),
-        userId: hashId.generateHash(cart.userId),
+        id: this.generateHash(cart.id),
+        userId: this.generateHash(cart.userId),
         items: cart.items.map(item => ({
             ...item,
-            id: hashId.generateHash(item.id),
-            productId: hashId.generateHash(item.productId)
+            id: this.generateHash(item.id),
+            cartId: this.generateHash(item.cartId),
+            productId: this.generateHash(item.productId),
+            product: this.transformProduct(item.product)
         }))
     });
 
     // Функция для преобразования заказа
     transformOrder = (order) => ({
         ...order,
-        id: hashId.generateHash(order.id),
-        userId: hashId.generateHash(order.userId),
+        id: this.generateHash(order.id),
+        userId: this.generateHash(order.userId),
         items: order.items.map(item => ({
             ...item,
-            id: hashId.generateHash(item.id),
-            productId: hashId.generateHash(item.productId)
+            id: this.generateHash(item.id),
+            productId: this.generateHash(item.productId)
         }))
     });
 }
