@@ -7,8 +7,8 @@ class OrderRepository {
     // GET metgod all orders of user
     async findOrdersByUserId(client, userId) {
         return client.order.findMany({ where: { userId: userId },
-            include: { items: { include: { product: true } },
-                        orderBy: { createdAt: 'desc' } } });
+            include: { items: { include: { product: true } } },
+                        orderBy: { createdAt: 'desc' } });
     };
 
     // GET method find order by id
@@ -19,7 +19,7 @@ class OrderRepository {
 
     // POST method create order
     async createOrder(client, data) {
-        return client.order.create({ data: data });
+        return client.order.create({ data: data, include: { items: true } });
     };
 
     // PUT method update status order
