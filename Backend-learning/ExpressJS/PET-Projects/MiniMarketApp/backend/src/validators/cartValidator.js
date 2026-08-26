@@ -2,7 +2,7 @@
 const Joi = require('joi');
 
 const addItemSchema = Joi.object({
-    productId: Joi.number().integer(),
+    productId: Joi.string().required(),
     quantity: Joi.number().integer().min(1),
 }).options({presence: 'required' }).required();
 
