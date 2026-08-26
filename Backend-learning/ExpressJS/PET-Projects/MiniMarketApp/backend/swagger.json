@@ -1143,6 +1143,103 @@
           }
         ]
       }
+    },
+    "/orders": {
+      "get": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "Получить все заказы пользователя",
+        "description": "Возвращает список всех заказов текущего пользователя. Требуется авторизация.",
+        "operationId": "getOrders",
+        "responses": {
+          "200": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Order"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized error"
+          },
+          "404": {
+            "description": "Not found error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "Создание нового заказа",
+        "description": "Создаёт заказ из текущей корзины пользователя. Требуется авторизация.",
+        "operationId": "createOrder",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Заказ успешно создан!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error (например, корзина пуста)"
+          },
+          "401": {
+            "description": "Unauthorized error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -1489,12 +1586,12 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "integer",
-            "example": 1
+            "type": "string",
+            "example": "1V231XKq"
           },
           "userId": {
-            "type": "integer",
-            "example": 1
+            "type": "string",
+            "example": "DoQegRY9"
           },
           "totalPrice": {
             "type": "number",
@@ -1528,6 +1625,17 @@
           }
         }
       },
+      "OrderRequest": {
+        "required": [
+          "address"
+        ],
+        "type": "object",
+        "properties": {
+          "address": {
+            "$ref": "#/components/schemas/Order_address"
+          }
+        }
+      },
       "OrderItem": {
         "required": [
           "orderId",
@@ -1538,16 +1646,16 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "integer",
-            "example": 1
+            "type": "string",
+            "example": "JG2M7X6w"
           },
           "orderId": {
-            "type": "integer",
-            "example": 1
+            "type": "string",
+            "example": "1V231XKq"
           },
           "productId": {
-            "type": "integer",
-            "example": 1
+            "type": "string",
+            "example": "jgQoV28D"
           },
           "quantity": {
             "type": "integer",
@@ -1556,7 +1664,7 @@
           "price": {
             "type": "number",
             "format": "float",
-            "example": 4.7
+            "example": 2.4
           }
         }
       },

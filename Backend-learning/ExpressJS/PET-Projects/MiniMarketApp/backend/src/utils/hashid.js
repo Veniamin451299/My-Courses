@@ -47,6 +47,7 @@ class HashId {
         items: order.items.map(item => ({
             ...item,
             id: this.generateHash(item.id),
+            orderId: this.generateHash(item.orderId),
             productId: this.generateHash(item.productId)
         }))
     });

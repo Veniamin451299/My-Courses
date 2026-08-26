@@ -35,10 +35,12 @@ class OrderService {
      * @param userId - user id
      * @return {Promise<Order>}
      * **/
-    async createOrder(userId) {
+    async createOrder(userId, address) {
       return await prisma.$transaction(async (tx) => {
          // 1. get user cart
+        console.log('userId in createOrder:', userId);
         const cart = await cartRepo.findCartByUserId(tx, userId);
+        console.log('cart found:', cart);
         if(!cart?.items.length) throw new BadRequestError('Cart is empty');
 
         // 2, Check if availability of products
@@ -53,7 +55,7 @@ class OrderService {
              item.quantity);
         
         // 4. Create order
-        const order = await orderRepo.createOrder(tx, { data: {
+        const order = await orderRepo.createOrder(tx, {
             userId,
             items: {
                 create: cart.items.map(item => ({
@@ -63,8 +65,8 @@ class OrderService {
                 }))
             },
             totalPrice: cart.totalPrice,
-            address: {} // get it from a query
-        }});
+            address: address
+        });
 
         // 5. Clear cart
         await cartItemRepo.deleteCartItemByCartId(tx, cart.id);
@@ -77,6 +79,7 @@ class OrderService {
                 event: 'purchase',
                 userId,
                 productId: item.productId,
+                sessionId: 'temporary-session-id', // или req.body.sessionId
                 metadata: {
                     orderId: order.id,
                     quantity: item.quantity,
