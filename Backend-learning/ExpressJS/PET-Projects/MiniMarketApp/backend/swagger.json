@@ -1367,6 +1367,227 @@
           }
         ]
       }
+    },
+    "/analytics/event": {
+      "post": {
+        "tags": [
+          "Analytics"
+        ],
+        "summary": "Создать событие",
+        "description": "Отправляет POST запрос к БД. Регистрирует новое событие в аналитике. \n\nТребуется авторизация администратора!",
+        "operationId": "createEventAnalytics",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalyticsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Analytics"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "401": {
+            "description": "Unauthorized error"
+          },
+          "403": {
+            "description": "Forbidden error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/analytics/top-products": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "summary": "Получить топ-продуктов",
+        "description": "Отправляет GET запрос к БД. Возвращает топ-продуктов. \n\nТребуется авторизация администратора!",
+        "operationId": "getTopProductsAnalytics",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Количество товаров в топе",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "example": 5,
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsTopProducts"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "401": {
+            "description": "Unauthorized error"
+          },
+          "403": {
+            "description": "Forbidden error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/analytics/revenue": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "summary": "Получить прибыль",
+        "description": "Отправляет GET запрос к БД. Возвращает прибыль за указанный период. \n\nТребуется авторизация администратора!",
+        "operationId": "getRevenueAnalytics",
+        "parameters": [
+          {
+            "name": "period",
+            "in": "query",
+            "description": "Период, в котором нужно получить прибыль",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "month",
+              "default": "month"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsRevenue"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "401": {
+            "description": "Unauthorized error"
+          },
+          "403": {
+            "description": "Forbidden error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/analytics/user-stats": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "summary": "Получить статистику по пользователям",
+        "description": "Отправляет GET запрос к БД. Возвращает статистику по пользователям. \n\nТребуется авторизация администратора!",
+        "operationId": "getUserStatsAnalytics",
+        "responses": {
+          "200": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsUserStats"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "401": {
+            "description": "Unauthorized error"
+          },
+          "403": {
+            "description": "Forbidden error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -1823,20 +2044,20 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "integer",
-            "example": 1
+            "type": "string",
+            "example": "1V231XKq"
           },
           "event": {
             "type": "string",
             "example": "purchase"
           },
           "userId": {
-            "type": "integer",
-            "example": 1
+            "type": "string",
+            "example": "DoQegRY9"
           },
           "productId": {
-            "type": "integer",
-            "example": 1
+            "type": "string",
+            "example": "jgQoV28D"
           },
           "sessionId": {
             "type": "string",
@@ -1854,6 +2075,173 @@
           },
           "metadata": {
             "$ref": "#/components/schemas/Analytics_metadata"
+          }
+        }
+      },
+      "AnalyticsRequest": {
+        "required": [
+          "event",
+          "metadata",
+          "sessionId"
+        ],
+        "type": "object",
+        "properties": {
+          "event": {
+            "type": "string",
+            "example": "purchase"
+          },
+          "userId": {
+            "type": "string",
+            "example": "DoQegRY9"
+          },
+          "productId": {
+            "type": "string",
+            "example": "jgQoV28D"
+          },
+          "sessionId": {
+            "type": "string",
+            "description": "ID сессии пользователя со стороны фронтенда",
+            "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Analytics_metadata"
+          }
+        }
+      },
+      "AnalyticsTopProducts": {
+        "required": [
+          "data",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsTopProduct"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "Общее количество покупок",
+            "example": 100
+          }
+        }
+      },
+      "AnalyticsTopProduct": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "example": "jgQoV28D"
+          },
+          "productName": {
+            "type": "string",
+            "example": "Молоко"
+          },
+          "productPrice": {
+            "type": "number",
+            "format": "float",
+            "example": 2.35
+          },
+          "count": {
+            "type": "integer",
+            "description": "Количество покупок этого товара",
+            "example": 42
+          },
+          "rank": {
+            "type": "integer",
+            "description": "Место в рейтинге (начиная с 1)",
+            "example": 1
+          },
+          "percentage": {
+            "type": "number",
+            "description": "Доля от общего числа покупок (в процентах)",
+            "format": "float",
+            "example": 15.5
+          }
+        }
+      },
+      "AnalyticsRevenue": {
+        "required": [
+          "data",
+          "summary"
+        ],
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AnalyticsRevenueData"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/AnalyticsRevenueSummary"
+          }
+        }
+      },
+      "AnalyticsRevenueData": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "example": "2026-08-23T19:40:49.385Z"
+          },
+          "orderCount": {
+            "type": "integer",
+            "example": 100
+          },
+          "revenue": {
+            "type": "number",
+            "format": "float",
+            "example": 100.5
+          }
+        }
+      },
+      "AnalyticsRevenueSummary": {
+        "type": "object",
+        "properties": {
+          "totalRevenue": {
+            "type": "integer",
+            "example": 100
+          },
+          "totalOrders": {
+            "type": "number",
+            "format": "float",
+            "example": 100.5
+          },
+          "averageOrderValue": {
+            "type": "number",
+            "format": "float",
+            "example": 100.5
+          },
+          "period": {
+            "type": "string",
+            "example": "month"
+          }
+        }
+      },
+      "AnalyticsUserStats": {
+        "type": "object",
+        "properties": {
+          "totalUsers": {
+            "type": "integer",
+            "example": 10
+          },
+          "activeUsers": {
+            "type": "integer",
+            "example": 5
+          },
+          "newUsers": {
+            "type": "integer",
+            "example": 3
+          },
+          "retentionRate": {
+            "type": "number",
+            "format": "float",
+            "example": 0.5
+          },
+          "conversionRate": {
+            "type": "number",
+            "format": "float",
+            "example": 0.7
           }
         }
       },
@@ -1917,8 +2305,8 @@
         "type": "object",
         "properties": {
           "orderId": {
-            "type": "integer",
-            "example": 1
+            "type": "string",
+            "example": "1V231XKq"
           },
           "totalPrice": {
             "type": "number",

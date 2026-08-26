@@ -52,6 +52,24 @@ class HashId {
             product: this.transformProduct(item.product)
         }))
     });
+
+    // Функция для преобразования аналитики топов
+    transformTop = (top) => ({
+        productId: this.generateHash(top.productId),
+        productName: top.productName,
+        productPrice: top.productPrice,
+        count: top.count,
+        rank: top.rank,
+        percentage: top.percentage
+    });
+
+    // Фнкция для преобразования аналитики событий
+    transformEvent = (event) => ({
+        ...event,
+        id: this.generateHash(event.id),
+        userId: this.generateHash(event.userId),
+        productId: this.generateHash(event.productId)
+    });
 }
 
 module.exports = new HashId();

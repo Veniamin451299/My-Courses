@@ -15,8 +15,8 @@ class AnalyticsRepository {
             SELECT 
                 "productId",
                 COUNT(*) as count,
-                p.name as productName,
-                p.price as productPrice
+                p.name as "productName",
+                p.price as "productPrice"
             FROM analytics a
             LEFT JOIN products p ON a."productId" = p.id
             WHERE a.event = 'purchase' 
@@ -29,22 +29,24 @@ class AnalyticsRepository {
 
     // GET method: Revenue statistics 
     async getRevenue(client, period = 'month') {
-      let dateFilter;
-      switch (period) {
-        case 'day': dateFilter = "NOW() - INTERVAL '1 day'"; break;
-        case 'week': dateFilter = "NOW() - INTERVAL '7 days'"; break;
-        case 'month': dateFilter = "NOW() - INTEVAL '30 days"; break;
-        case 'year': dateFilter = "NOW() - INTERVAL '365 days'"; break;
-        default: dateFilter = "NOW() - INTERVAL '30 days'";
-      }  
-      return await client.$queryRaw`
-         SELECT 
+        const now = new Date();
+        let startDate;
+        switch (period) {
+            case 'day': startDate = new Date(now - 24 * 60 * 60 * 1000); break;
+            case 'week': startDate = new Date(now - 7 * 24 * 60 * 60 * 1000); break;
+            case 'month': startDate = new Date(now - 30 * 24 * 60 * 60 * 1000); break;
+            case 'year': startDate = new Date(now - 365 * 24 * 60 * 60 * 1000); break;
+            default: startDate = new Date(now - 30 * 24 * 60 * 60 * 1000);
+        }
+
+        return await client.$queryRaw`
+            SELECT 
                 DATE(o."createdAt") as date,
                 COUNT(o.id) as orders_count,
                 SUM(o."totalPrice") as revenue
             FROM orders o
             WHERE o.status = 'PAID' 
-                AND o."createdAt" >= ${dateFilter}
+                AND o."createdAt" >= ${startDate}
             GROUP BY DATE(o."createdAt")
             ORDER BY date DESC
         `;
@@ -52,9 +54,9 @@ class AnalyticsRepository {
 
     // GET method: user statistics
     async getUserStats(client) {
-        const [totalUsers, newUsers, activeUsers] = await Promise.all([
+        const [totalUsers, newUsers, activeUsers, usersWithOrders] = await Promise.all([
             client.user.count(),
-            client.user.cotnt({
+            client.user.count({
                 where: {
                     createdAt: {
                         gte: new Date(new Date() - 30 * 24 * 60 * 60 * 1000) // 30 days
@@ -63,17 +65,22 @@ class AnalyticsRepository {
             }),
             client.order.groupBy({
                 by: ['userId'],
-                having: {
-                    createdBy: {
-                        gte: new Date(new Date() - 30 * 24 * 60 * 60 * 1000) // 30 days
+                where: {
+                    createdAt: {
+                        gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // 30 days
                     }
                 }
+            }),
+            client.order.groupBy({
+                by: ['userId'],
+                where: { status: 'PAID' }
             })
         ]);
         return { 
             totalUsers, 
             newUsersLast30Days: newUsers, 
-            activeUsersLast30Days: activeUsers.length 
+            activeUsersLast30Days: activeUsers.length,
+            usersWithOrders: usersWithOrders.length
         };
     };
 }

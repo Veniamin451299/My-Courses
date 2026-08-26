@@ -1,6 +1,7 @@
 // path: backen/src/controllers/analyticsController.js
 const analyticsService = require('../services/analyticsService');
 const { NotFoundError, BadRequestError } = require('../middlewares/errors/errorHandler');
+const hashId = require('../utils/hashid');
 
 class AnalyticsController {
 
@@ -9,13 +10,32 @@ class AnalyticsController {
      * @route POST /api/analytics/event
      * @access Private
      * **/
-    async createEventAnalytics(req, res, next) { 
+    async createEventAnalytics(req, res, next) {
         try {
-            const data = req.body;
+            let data = req.body;
+            if (!data) return next(new BadRequestError('Invalid data'));
+
+            // Декодируем хэши в числа (если они есть)
+            if (data.userId) {
+                const decodedUserId = hashId.decodeHash(data.userId);
+                if (!decodedUserId) return next(new BadRequestError('Invalid userId hash'));
+                data.userId = decodedUserId;
+            }
+            if (data.productId) {
+                const decodedProductId = hashId.decodeHash(data.productId);
+                if (!decodedProductId) return next(new BadRequestError('Invalid productId hash'));
+                data.productId = decodedProductId;
+            }
+
+            // Если нужно — можно добавить ip и userAgent из заголовков
+            data.ip = req.ip;
+            data.userAgent = req.headers['user-agent'];
+
             const eventAnalytics = await analyticsService.createEventAnalytics(data);
+            // Если нужно закодировать ID для ответа — можно применить transform, но пока просто вернём
             return res.status(201).json({
                 message: 'Event analytics created successfully',
-                data: eventAnalytics
+                data: hashId.transformEvent(eventAnalytics)
             });
         } catch (error) {
             return next(new BadRequestError(`Bad request error: ${error.message}`));
@@ -33,7 +53,7 @@ class AnalyticsController {
             const topProducts = await analyticsService.getTopProducts(limit);
             return res.status(200).json({
                 message: 'Top products retrieved successfully',
-                data: topProducts
+                data: topProducts.data.map(hashId.transformTop)
             });
         } catch (error) {
             return next(new BadRequestError(`Bad request error: ${error.message}`));
