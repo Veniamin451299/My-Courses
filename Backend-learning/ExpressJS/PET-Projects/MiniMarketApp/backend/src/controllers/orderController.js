@@ -33,7 +33,7 @@ class OrderController {
      * **/
     async getOrderById(req, res, next) {
         try {
-            const decodedOrderId = hashId.decodeHash(req.params.orderId);
+            const decodedOrderId = hashId.decodeHash(req.params.id);
             if (!decodedOrderId) return next(new BadRequestError('Invalid order id'));
 
             const order = await orderService.getOrderById(decodedOrderId);
@@ -78,7 +78,7 @@ class OrderController {
      * **/
     async updateOrderStatus(req, res, next) {
         try {
-            const decodedOrderId = hashId.decodeHash(req.params.orderId);
+            const decodedOrderId = hashId.decodeHash(req.params.id);
             if (!decodedOrderId) return next(new BadRequestError('Invalid order id'));
 
             const order = await orderService.updateOrderStatus(decodedOrderId, req.body.status);

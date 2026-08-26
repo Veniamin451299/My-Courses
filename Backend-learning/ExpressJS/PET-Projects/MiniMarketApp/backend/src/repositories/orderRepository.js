@@ -24,7 +24,9 @@ class OrderRepository {
 
     // PUT method update status order
     async updateOrderStatus(client, orderId, status) {
-        return client.order.update({ where: { id: orderId }, data: { status: status } });
+        return client.order.update({ where: { id: orderId }, data: { status: status },
+            include: { items: { include: { product: true } } }
+        });
     };
 }
 

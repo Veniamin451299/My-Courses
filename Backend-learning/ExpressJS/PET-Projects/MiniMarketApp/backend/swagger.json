@@ -1150,7 +1150,7 @@
           "Order"
         ],
         "summary": "Получить все заказы пользователя",
-        "description": "Возвращает список всех заказов текущего пользователя. Требуется авторизация.",
+        "description": "Возвращает список всех заказов текущего пользователя. \n\nТребуется авторизация.",
         "operationId": "getOrders",
         "responses": {
           "200": {
@@ -1194,7 +1194,7 @@
           "Order"
         ],
         "summary": "Создание нового заказа",
-        "description": "Создаёт заказ из текущей корзины пользователя. Требуется авторизация.",
+        "description": "Создаёт заказ из текущей корзины пользователя. \n\nТребуется авторизация.",
         "operationId": "createOrder",
         "requestBody": {
           "content": {
@@ -1222,6 +1222,133 @@
           },
           "401": {
             "description": "Unauthorized error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/orders/{id}": {
+      "get": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "Получить заказ по ID",
+        "description": "Отправляет GET запрос к БД. Возвращает заказ пользователя по его уникальному идентификатору. \n\nТребуется авторизация!",
+        "operationId": "getOrderById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID заказа",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "jgQoV28D"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "401": {
+            "description": "Unauthorized error"
+          },
+          "404": {
+            "description": "Not found error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "Обновить статус заказа",
+        "description": "Отправялет PUT запрос к БД. Обновляет статус заказа администратором. \n\nТребуется авторизация администратора!",
+        "operationId": "updateOrderStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID заказа",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "jgQoV28D"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderUpdateStatusRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "401": {
+            "description": "Unauthorized error"
+          },
+          "403": {
+            "description": "Forbidden error"
+          },
+          "404": {
+            "description": "Not found error"
           },
           "default": {
             "description": "Unexpected error",
@@ -1665,6 +1792,25 @@
             "type": "number",
             "format": "float",
             "example": 2.4
+          }
+        }
+      },
+      "OrderUpdateStatusRequest": {
+        "required": [
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "PAID",
+            "enum": [
+              "PENDING",
+              "PAID",
+              "SHIPPED",
+              "DELIVERED",
+              "CANCELED"
+            ]
           }
         }
       },
