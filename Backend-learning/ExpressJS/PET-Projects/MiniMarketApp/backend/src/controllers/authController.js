@@ -37,7 +37,7 @@ class AuthController {
                 }
             });
         } catch (err) {
-            next(new BadRequestError(`Interanl Server Error: ${err.message}`));
+            next(new BadRequestError(`Bad request error: ${err.message}`));
         }
     };
 
@@ -70,7 +70,7 @@ class AuthController {
                 }
             });
         } catch (err) {
-            next(new BadRequestError(`Interanl Server Error: ${err.message}`));
+            next(new BadRequestError(`Bad request error: ${err.message}`));
         }
     };
 
@@ -107,7 +107,7 @@ class AuthController {
             await userService.deleteRefreshToken(req.user.id);
             return res.status(200).json({ message: "Logout successfully" });
         } catch (err) {
-            return next(new BadRequestError(`Interanl Server Error: ${err.message}`));
+            return next(new BadRequestError(`Bad request error: ${err.message}`));
         }
     };
 
@@ -133,7 +133,7 @@ class AuthController {
             });
         } catch (err) {
             console.log('ERROR in me: ', err);
-            return next(new BadRequestError(`Interanl Server Error: ${err.message}`));
+            return next(new BadRequestError(`Bad request error: ${err.message}`));
         }
     }
 }

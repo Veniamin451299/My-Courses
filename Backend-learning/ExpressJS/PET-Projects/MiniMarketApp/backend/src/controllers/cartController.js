@@ -21,7 +21,7 @@ class CartController {
                 message: "Get cart successfully", 
                 data: hashId.transformCart(cart) }); 
         } catch (error) {
-            return next(new BadRequestError(`Internal Server Error: ${error.message}`));
+            return next(new BadRequestError(`Bad request error: ${error.message}`));
         }
     };
 
@@ -41,11 +41,11 @@ class CartController {
             const cart = await cartService.addItem(decodedUserId, decodedProductId, quantity);
             if (!cart) return next(new NotFoundError('Cart not found'));
 
-            return res.status(200).json({ 
+            return res.status(201).json({ 
                 message: "Add item to cart successfully", 
                 data: hashId.transformCart(cart) });
         } catch (error) {
-            return next(new BadRequestError(`Internal Server Error: ${error.message}`));       
+            return next(new BadRequestError(`Bad request error: ${error.message}`));       
         }
     };
 
@@ -69,7 +69,7 @@ class CartController {
                 message: "Update item in cart successfully", 
                 data: hashId.transformCart(updatedCart) });
         } catch (error) {
-            return next(new BadRequestError(`Internal Server Error: ${error.message}`));       
+            return next(new BadRequestError(`Bad request error: ${error.message}`));       
         }
     };
 
@@ -92,7 +92,7 @@ class CartController {
             data: hashId.transformCart(deletedCart)
         })
       } catch (error) {
-          return next(new BadRequestError(`Internal Server Error: ${error.message}`));
+          return next(new BadRequestError(`Bad request error: ${error.message}`));
       } 
     };
 
@@ -114,7 +114,7 @@ class CartController {
                 data: hashId.transformCart(clearCart)
             })
         } catch (error) {
-            return next(new BadRequestError(`Internal Server Error: ${error.message}`));
+            return next(new BadRequestError(`Bad request error: ${error.message}`));
         }
     };
 }

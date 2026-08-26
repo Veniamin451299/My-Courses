@@ -11,13 +11,22 @@ class CategoryController {
     async getCategories(req, res, next) {
         try {
             const categories = await categoryService.getCategories();
-            if (!categories) return next(new NotFoundError('Categories not found'));
+            if (!categories || categories.length === 0) {
+                return next(new NotFoundError('Categories not found'));
+            }
+
+            // ✅ Проходим по каждому элементу и хешируем id
+            const hashedCategories = categories.map(category => ({
+                ...category,
+                id: hashId.generateHash(category.id)
+            }));
+
             res.json({
                 message: "Get categories successfully",
-                data: categories
+                data: hashedCategories
             });
         } catch (error) {
-            next(new BadRequestError(`Internal Server Error: ${error.message}`));
+            next(new BadRequestError(`Bad Request Error: ${error.message}`));
         }
     };
 
@@ -25,9 +34,9 @@ class CategoryController {
      * @route GET /categories/:id
      * @access Public
      * **/ 
-    async getCategoryById(categoryId) {
+    async getCategoryById(req, res, next) {
         try {
-            const decodedCategoryId = hashId.decodeHash(categoryId);
+            const decodedCategoryId = hashId.decodeHash(req.params.id);
             if (!decodedCategoryId) return next(new BadRequestError('Invalid category id'));
 
             const category = await categoryService.getCategoryById(decodedCategoryId);
@@ -39,7 +48,7 @@ class CategoryController {
                 data: category
             });
         } catch (error) {
-            next(new BadRequestError(`Internal Server Error: ${error.message}`));
+            next(new BadRequestError(`Bad request error: ${error.message}`));
         }
     };
 
@@ -58,7 +67,7 @@ class CategoryController {
                 data: createdCategory
             });
         } catch (error) {
-            next(new BadRequestError(`Internal Server Error: ${error.message}`));
+            next(new BadRequestError(`Bad request error: ${error.message}`));
         }
     };
 
@@ -75,12 +84,12 @@ class CategoryController {
             if (!updatedCategory) return next(new NotFoundError('Category not found'));
 
             updatedCategory.id = hashId.generateHash(updatedCategory.id);
-            res.status(201).json({
+            res.status(200).json({
                 message: "Update category successfully",
                 data: updatedCategory
             });
         } catch (error) {
-            next(new BadRequestError(`Internal Server Error: ${error.message}`));
+            next(new BadRequestError(`Bad request error: ${error.message}`));
         }
     };
 
@@ -102,7 +111,7 @@ class CategoryController {
                 data: deletedCategory
             });
         } catch (error) {
-            next(new BadRequestError(`Internal Server Error: ${error.message}`));
+            next(new BadRequestError(`Bad request error: ${error.message}`));
         }
     };
 }

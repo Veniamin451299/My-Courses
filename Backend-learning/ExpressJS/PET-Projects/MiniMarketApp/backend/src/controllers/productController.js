@@ -16,18 +16,23 @@ class ProductController {
 
             const products = await productService.getProducts({
                 page: Number(page) || 1, 
-                limit: Number(limit) || 1, 
+                limit: Number(limit) || 10, 
                 category, 
                 name
             });
             if (!products) return next(new NotFoundError(), 'Product not found');
 
+            const hashedProducts = products.data.map(product => ({
+                ...product,
+                id: hashId.generateHash(product.id),
+                categoryId: hashId.generateHash(product.categoryId)
+            }));
             res.status(200).json({
                 message: 'Products retrieved successfully',
-                data: products
+                data: hashedProducts
             });
         } catch (err) {
-            next(new BadRequestError(`Interanl Server Error: ${err.message}`));
+            next(new BadRequestError(`Bad request error: ${err.message}`));
         }
     };
 
@@ -45,12 +50,13 @@ class ProductController {
             if (!product) return next(new NotFoundError('Product not found'));
 
             product.id = hashId.generateHash(product.id);
+            product.categoryId = hashId.generateHash(product.categoryId);
             res.status(200).json({
                 message: 'Product retrieved successfully',
                 data: product
             });
         } catch (err) {
-            next(new BadRequestError(`Interanl Server Error: ${err.message}`));
+            next(new BadRequestError(`Bad request error: ${err.message}`));
         }
     };
 
@@ -65,12 +71,13 @@ class ProductController {
             if (!createdProduct) return next(new BadRequestError("Create product failed"));
             
             createdProduct.id = hashId.generateHash(createdProduct.id);
+            createdProduct.categoryId = hashId.generateHash(createdProduct.categoryId);
             res.status(201).json({
                 message: "Create product successfully",
                 data: createdProduct
             });
         } catch (err) {
-            next(new BadRequestError(`Interanl Server Error: ${err.message}`));
+            next(new BadRequestError(`Bad request error: ${err.message}`));
         }
     };
 
@@ -88,12 +95,13 @@ class ProductController {
             if (!updatedProduct) return next(new NotFoundError('Product not found'));
 
             updatedProduct.id = hashId.generateHash(updatedProduct.id);
-            res.status(201).json({
+            updatedProduct.categoryId = hashId.generateHash(updatedProduct.categoryId);
+            res.status(200).json({
                 message: 'Update product successfully',
                 data: updatedProduct
             });
         } catch (err) {
-            next(new BadRequestError(`Interanl Server Error: ${err.message}`));
+            next(new BadRequestError(`Bad request error: ${err.message}`));
         }
     };
 
@@ -111,12 +119,13 @@ class ProductController {
             if (!deletedProduct) return next(new NotFoundError('Product not found'));
             
             deletedProduct.id = hashId.generateHash(deletedProduct.id);
+            deletedProduct.categoryId = hashId.generateHash(deletedProduct.categoryId);
             res.status(200).json({
                 message: 'Delete product successfully',
                 data: deletedProduct
             });
         } catch (err) {
-            next(new BadRequestError(`Interanl Server Error: ${err.message}`));
+            next(new BadRequestError(`Bad request error: ${err.message}`));
         }
     };
 }

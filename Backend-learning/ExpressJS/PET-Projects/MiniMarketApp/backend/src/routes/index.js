@@ -5,6 +5,7 @@ const productRouter = require('./products');
 const cartRouter = require('./cart');
 const orderRouter = require('./orders');
 const analyticsRouter = require('./analytics');
+const categoryRouter = require('./category');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('../../swagger.json');
 
@@ -29,6 +30,7 @@ router.use(
 );
 
 router.use('/auth', authRouter);
+router.use('/categories', categoryRouter);
 router.use('/products', productRouter);
 router.use('/cart', cartRouter);
 router.use('/orders', orderRouter);

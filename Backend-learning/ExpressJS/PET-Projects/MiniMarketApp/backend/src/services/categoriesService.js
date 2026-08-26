@@ -1,6 +1,8 @@
 // path: backend/src/services/categoriesService.js
 const categoryRepo = require('../repositories/categoryRepository');
 const cache = require('../utils/cache');
+const {BadRequestError} = require('../middlewares/errors/errorHandler');
+const prisma = require('../config/prisma');
 
 class CategoryService {
     /** GET Method for get all categories
@@ -64,10 +66,18 @@ class CategoryService {
      * **/
     async deleteCategory(categoryId) {
         const cacheKey = 'categories';
-        const deleteCategory = await categoryRepo.delete(categoryId);
+        
+        // Удаляем все товары в этой категории
+        const { count } = await prisma.product.deleteMany({
+            where: { categoryId }
+        });
+        console.log(`Deleted ${count} products`);
+        
+        // Удаляем категорию
+        const deletedCategory = await categoryRepo.delete(categoryId);
         await cache.del(cacheKey);
-        return deleteCategory;
+        return deletedCategory;
     };
 }
 
-modele.exports = new CategoryService();
+module.exports = new CategoryService();
