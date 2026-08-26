@@ -48,7 +48,8 @@ class HashId {
             ...item,
             id: this.generateHash(item.id),
             orderId: this.generateHash(item.orderId),
-            productId: this.generateHash(item.productId)
+            productId: this.generateHash(item.productId),
+            product: this.transformProduct(item.product)
         }))
     });
 }
