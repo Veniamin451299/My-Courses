@@ -8,7 +8,7 @@ class CacheService {
         const data = await redis.get(key);
         if (!data) return null;
         try {
-            return JSON.parse(data);
+            return typeof data === 'string' ? data : JSON.parse(data);
         } catch {
             return data;
         }
@@ -20,12 +20,12 @@ class CacheService {
 
   async set(key, value, ttl = 3600) {
     try {
-      await redis.set(key, value, { EX: ttl });
-   } catch (redisError) {
-      logger.error({error: redisError}, 'Redis SET error');
+        const data = typeof value === 'string' ? value : JSON.stringify(value);
+        await redis.set(key, data, { EX: ttl });
+    } catch (redisError) {
+        logger.error({ error: redisError }, 'Redis SET error');
     }
-  }
-
+}
   async del(key) {
     try {
       await redis.del(key);
