@@ -3,7 +3,6 @@ const request = require('supertest');
 const { app } = require('../../src/app');
 const config = require('../../src/config/env');
 const logger = require('../../src/config/logger');
-const { ref } = require('node:process');
 
 const adminLogin = async () => {
     try{ 
@@ -22,6 +21,26 @@ const adminLogin = async () => {
         }
     } catch (err) {
         logger.error('Admin login failed', err);
+        return null;
+    }
+};
+
+const userLogin = async (email, password) => {
+    try {
+        const response = await request(app)
+            .post('/api/auth/login')
+            .send({ email, password });
+
+        if (response.body?.data) {
+            return {
+                response,
+                accessToken: response.body.data.accessToken,
+                refreshToken: response.body.data.refreshToken
+            };
+        }
+    } catch (err) {
+        logger.error('User login failed', err);
+        return null;
     }
 };
 
@@ -92,6 +111,7 @@ const logout = async (accessToken) => {
 
 module.exports = {
     adminLogin,
+    userLogin,
     createUserAndLogin,
     refreshToken,
     meResponse,
