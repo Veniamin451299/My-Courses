@@ -12,7 +12,16 @@ class ProductController {
      * **/
     async getProducts(req, res, next) { 
         try {
-            const { page, limit, category, name } = req.query;
+            let { page, limit, category, name } = req.query;
+
+            if (category) {
+                const decodedCategory = hashId.decodeHash(category);
+                if (decodedCategory) {
+                    category = decodedCategory;
+                } else {
+                    return next(new BadRequestError('Invalid category hash'));
+                }
+            }
 
             const products = await productService.getProducts({
                 page: Number(page) || 1, 
@@ -20,7 +29,9 @@ class ProductController {
                 category, 
                 name
             });
-            if (!products) return next(new NotFoundError(), 'Product not found');
+            if (!products || !products.data) {
+                return next(new NotFoundError('Products not found'));
+            }
 
             const hashedProducts = products.data.map(product => ({
                 ...product,
@@ -67,6 +78,10 @@ class ProductController {
      * **/
     async createProduct(req, res, next) { 
         try {
+            if (req.body.categoryId) {
+                req.body.categoryId = hashId.decodeHash(req.body.categoryId);
+            }
+
             const createdProduct = await productService.createProduct(req.body);
             if (!createdProduct) return next(new BadRequestError("Create product failed"));
             
@@ -88,6 +103,10 @@ class ProductController {
      * **/ 
     async updateProduct(req, res, next) { 
         try {
+            if (req.body.categoryId) {
+                req.body.categoryId = hashId.decodeHash(req.body.categoryId);
+            }
+            
             const decodedProductId = hashId.decodeHash(req.params.id);
             if (!decodedProductId) return next(new BadRequestError('Invalid product ID'));
 
