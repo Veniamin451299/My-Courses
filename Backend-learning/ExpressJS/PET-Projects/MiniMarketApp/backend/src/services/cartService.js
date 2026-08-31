@@ -12,8 +12,11 @@ class CartService {
      * @return {Promise<Cart>}
      * **/
     async getCart(userId) {
-        const cart = await cartRepo.findCartByUserId(prisma, userId);
-        if (!cart) throw new NotFoundError('Cart not found');
+        let cart = await cartRepo.findCartByUserId(prisma, userId);
+        if (!cart) {
+            cart = await cartRepo.createCart(prisma, userId);
+            cart = await cartRepo.findCartByUserId(prisma, userId);
+        }
         return cart;
     };
 

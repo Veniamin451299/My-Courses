@@ -1790,8 +1790,8 @@
             }
           },
           "categoryId": {
-            "type": "integer",
-            "example": 1
+            "type": "string",
+            "example": "wkRDNQjr"
           },
           "isActive": {
             "type": "boolean",

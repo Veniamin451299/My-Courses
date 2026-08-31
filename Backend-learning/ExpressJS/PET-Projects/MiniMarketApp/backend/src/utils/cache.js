@@ -8,9 +8,9 @@ class CacheService {
         const data = await redis.get(key);
         if (!data) return null;
         try {
-            return typeof data === 'string' ? data : JSON.parse(data);
+            return JSON.parse(data);
         } catch {
-            return data;
+            return data; // Если не JSON — возвращаем как строку
         }
     } catch (redisError) {
         logger.error({error: redisError}, 'Redis GET error');
@@ -25,7 +25,7 @@ class CacheService {
     } catch (redisError) {
         logger.error({ error: redisError }, 'Redis SET error');
     }
-}
+  }
   async del(key) {
     try {
       await redis.del(key);
