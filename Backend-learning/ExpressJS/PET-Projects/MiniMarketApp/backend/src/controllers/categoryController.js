@@ -10,23 +10,15 @@ class CategoryController {
      * **/
     async getCategories(req, res, next) {
         try {
-            const categories = await categoryService.getCategories();
-            if (!categories || categories.length === 0) {
-                return next(new NotFoundError('Categories not found'));
+            const result = await categoryService.getCategories(); // допустим, возвращает { data: [...] }
+            const categories = result.data || result; // fallback, если вдруг массив
+            if (!Array.isArray(categories)) {
+                return next(new BadRequestError('Invalid data format'));
             }
-
-            // ✅ Проходим по каждому элементу и хешируем id
-            const hashedCategories = categories.map(category => ({
-                ...category,
-                id: hashId.generateHash(category.id)
-            }));
-
-            res.json({
-                message: "Get categories successfully",
-                data: hashedCategories
-            });
-        } catch (error) {
-            next(new BadRequestError(`Bad Request Error: ${error.message}`));
+            const hashed = categories.map(cat => ({ ...cat, id: hashId.generateHash(cat.id) }));
+            res.json({ message: 'Categories retrieved', data: hashed });
+        } catch (err) {
+            next(new BadRequestError(err.message));
         }
     };
 
