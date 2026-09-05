@@ -68,8 +68,14 @@ class AnalyticsService {
         const totalOrders = revenue.reduce((sum, day) => sum + Number(day.orders_count), 0);
         const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
+        const transformedRevenue = revenue.map(day => ({
+            date: day.date,
+            orders_count: Number(day.orders_count),
+            revenue: Number(day.revenue)
+        }));
+
         return {
-            data: revenue,
+            data: transformedRevenue,
             summary: {
                 totalRevenue,
                 totalOrders,
