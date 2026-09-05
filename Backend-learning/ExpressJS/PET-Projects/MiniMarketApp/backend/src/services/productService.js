@@ -13,18 +13,22 @@ class ProductService {
      * @param {string} [name] - The name of the product
      * @returns {Promise<Object>} - The products
      * **/
-    async getProducts(page = 1, limit = 10, category, name) {
+    async getProducts({ page = 1, limit = 10, category, name } = {}) { // деструкторизация объекта
         const cacheKey = `products:${page}:${limit}:${category || 'all'}:${name || 'all'}`;
         const skip = (page - 1) * limit;
         const take = limit;
-
 
         const cachedResult = await cache.get(cacheKey);
         if (cachedResult) return cachedResult;
 
         // Собираем фильтры
         const where = {};
-        if (category) where.categoryId = parseInt(category);
+        if (category && category !== 'all') {
+            const categoryId = parseInt(category);
+            if (!isNaN(categoryId)) {
+                where.categoryId = categoryId;
+            }
+        }
         if (name) where.name = { contains: name, mode: 'insensitive' };
 
         // Запросы в БД
@@ -74,7 +78,7 @@ class ProductService {
     async createProduct (productData) {
         const createProduct = await productRepo.create(productData); 
         // Проверяем, существует ли категория
-        const category = await productRepo.findById(productData.categoryId);
+        const category = await productRepo.findById(prisma, productData.categoryId);
         if (!category) throw new NotFoundError('Category not found');
         // Инвалидация кэша
         await cache.delPattern(`products:*`);

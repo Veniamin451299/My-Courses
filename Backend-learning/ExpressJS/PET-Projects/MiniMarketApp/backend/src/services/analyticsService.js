@@ -27,10 +27,15 @@ class AnalyticsService {
     const totalPurchase = topProducts.reduce((sum, item) => sum + Number(item.count), 0);
 
     const productsWithRank = topProducts.map((item, index) => ({
-        ...item,
-        rank = index + 1,
-        precentage = (item.count / totalPurchase * 100) 
-    })); 
+        productId: Number(item.productId),
+        productName: item.productName,
+        productPrice: Number(item.productPrice),
+        count: Number(item.count),
+        rank: index + 1,
+        percentage: totalPurchase > 0
+            ? Math.round((Number(item.count) / totalPurchase) * 100) / 100
+            : 0,
+    }));
     
     return {
         data: productsWithRank,
@@ -45,16 +50,32 @@ class AnalyticsService {
    * **/
     async getRevenue(period = 'month') {
         const revenue = await analyticsRepo.getRevenue(prisma, period);
+        
+        // Если данных нет — возвращаем пустой массив и нулевые суммы
         if (!revenue || revenue.length === 0) {
-            throw new NotFoundError('Not found revenue');
+            return {
+                data: [],
+                summary: {
+                    totalRevenue: 0,
+                    totalOrders: 0,
+                    averageOrderValue: 0,
+                    period
+                }
+            };
         }
-    
+
         const totalRevenue = revenue.reduce((sum, day) => sum + Number(day.revenue), 0);
         const totalOrders = revenue.reduce((sum, day) => sum + Number(day.orders_count), 0);
         const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
-        
+
+        const transformedRevenue = revenue.map(day => ({
+            date: day.date,
+            orders_count: Number(day.orders_count),
+            revenue: Number(day.revenue)
+        }));
+
         return {
-            data: revenue,
+            data: transformedRevenue,
             summary: {
                 totalRevenue,
                 totalOrders,
@@ -78,9 +99,7 @@ class AnalyticsService {
         
         // Расчет коэффициентов
         const retentionRate = totalUsers > 0 ? (activeUsers / totalUsers) * 100 : 0;
-        const conversionRate = userStats.totalOrders 
-            ? (userStats.totalOrders / totalUsers) * 100 
-            : 0;
+        const conversionRate = totalUsers > 0 ? (userStats.usersWithOrders / totalUsers) * 100 : 0;
 
         return {
             totalUsers,

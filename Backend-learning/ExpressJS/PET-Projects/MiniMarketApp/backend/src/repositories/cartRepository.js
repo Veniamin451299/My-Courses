@@ -11,7 +11,8 @@ class CartRepository {
 
     // GET method find cart item by product
     async findCartItemByProduct(client, cartId, productId) {
-        return client.cart.findUnique({ where: { cartId_productId: { cartId, productId } } });
+        return client.cartItem.findUnique({ where: { cartId_productId: 
+            { cartId: cartId, productId: productId  } } });
     };
 
     // GET method fund cart item by id
@@ -21,7 +22,7 @@ class CartRepository {
 
     // POST method for create cart
     async createCart(client, userId) {
-        return client.cart.create({ data: userId });
+        return client.cart.create({ data:{ userId: userId, totalPrice: 0} });
     }
 
     // POST method for create cart-item in cart

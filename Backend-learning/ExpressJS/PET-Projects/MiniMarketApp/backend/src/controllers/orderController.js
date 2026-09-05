@@ -11,7 +11,7 @@ class OrderController {
      * **/
     async getAllOrders(req, res, next) {
         try {
-            const decodedUserId = hashId.decodeHash(req.user.id);
+            const decodedUserId = hashId.decodeHash(req.user.hashedId);
             if (!decodedUserId) return next(new BadRequestError('Invalid user id'));
 
             const orders = await orderService.getAllOrder(decodedUserId);
@@ -19,9 +19,10 @@ class OrderController {
 
             return res.status(200).json({ 
                 message: "Get orders successfully", 
-                data: hashId.transformOrders(orders) });
+                data: orders.map(order => hashId.transformOrder(order))
+            });
         } catch (error) {
-            return next(new BadRequestError(`Internal Server Error: ${error.message}`));
+            return next(new BadRequestError(`Bad request error: ${error.message}`));
         }
     };
 
@@ -32,7 +33,7 @@ class OrderController {
      * **/
     async getOrderById(req, res, next) {
         try {
-            const decodedOrderId = hashId.decodeHash(req.params.orderId);
+            const decodedOrderId = hashId.decodeHash(req.params.id);
             if (!decodedOrderId) return next(new BadRequestError('Invalid order id'));
 
             const order = await orderService.getOrderById(decodedOrderId);
@@ -42,7 +43,7 @@ class OrderController {
                 message: "Get order successfully", 
                 data: hashId.transformOrder(order) });
         } catch (error) {
-            return next(new BadRequestError(`Internal Server Error: ${error.message}`));
+            return next(new BadRequestError(`Bad request error: ${error.message}`));
         }
     };
 
@@ -53,17 +54,20 @@ class OrderController {
      * **/
     async createOrder(req, res, next) {
         try {
-            const decodedUserId = hashId.decodeHash(req.user.id);
+            const decodedUserId = hashId.decodeHash(req.user.hashedId);
             if (!decodedUserId) return next(new BadRequestError('Invalid user id'));
 
-            const order = await orderService.createOrder(decodedUserId);
+            const address = req.body.address;
+            if (!address) return next(new BadRequestError('Address not found'));
+
+            const order = await orderService.createOrder(decodedUserId, address);
             if (!order) return next(new NotFoundError('Order not found'));
 
-            return res.status(200).json({ 
+            return res.status(201).json({ 
                 message: "Create order successfully", 
                 data: hashId.transformOrder(order) });
         } catch (error) {
-            return next(new BadRequestError(`Internal Server Error: ${error.message}`));
+            return next(new BadRequestError(`Bad request error: ${error.message}`));
         }
     };
 
@@ -74,7 +78,7 @@ class OrderController {
      * **/
     async updateOrderStatus(req, res, next) {
         try {
-            const decodedOrderId = hashId.decodeHash(req.params.orderId);
+            const decodedOrderId = hashId.decodeHash(req.params.id);
             if (!decodedOrderId) return next(new BadRequestError('Invalid order id'));
 
             const order = await orderService.updateOrderStatus(decodedOrderId, req.body.status);
@@ -84,7 +88,7 @@ class OrderController {
                 message: "Update order successfully", 
                 data: hashId.transformOrder(order) });
         } catch (error) {
-            return next(new BadRequestError(`Internal Server Error: ${error.message}`));
+            return next(new BadRequestError(`Bad request error: ${error.message}`));
         }
     };
 }

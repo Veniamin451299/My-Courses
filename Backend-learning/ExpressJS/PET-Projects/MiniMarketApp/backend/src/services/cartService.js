@@ -12,8 +12,11 @@ class CartService {
      * @return {Promise<Cart>}
      * **/
     async getCart(userId) {
-        const cart = await cartRepo.findCartByUserId(prisma, userId);
-        if (!cart) throw new NotFoundError('Cart not found');
+        let cart = await cartRepo.findCartByUserId(prisma, userId);
+        if (!cart) {
+            cart = await cartRepo.createCart(prisma, userId);
+            cart = await cartRepo.findCartByUserId(prisma, userId);
+        }
         return cart;
     };
 
@@ -28,7 +31,7 @@ class CartService {
             // 1. Find cart of user or create new cart
             let cart = await cartRepo.findCartByUserId(tx, userId);
             if (!cart) cart = await cartRepo.createCart(tx,userId);
-           
+
             /** 2. Check if product exists **/
             const product = await productRepo.findById(tx, productId);
             if (!product) throw new NotFoundError('Product not found');
@@ -62,11 +65,7 @@ class CartService {
     async updateItemQuantity(userId, cartItemId, newQuantity) {
         return await prisma.$transaction(async (tx) => {
             const cart = await cartRepo.findCartByUserId(tx, userId);
-            if(!cart) throw new NotFoundError('Cart not found'); 
-
-            const cart = await cartRepo.findCartByUserId(tx, userId);
-            if(!cart || cartItem.cartId !== cart.id) throw new NotFoundError('Cart not found');
-            
+            if(!cart) throw new NotFoundError('Cart not found');
             await cartRepo.updateCartItem(tx, cartItemId, newQuantity);
             // Recalculate total price
             const items = await cartItemRepo.findCartItemByCartId(tx, cart.id);
@@ -83,7 +82,7 @@ class CartService {
     async deleteCartItem(userId, cartItemId) {
         return await prisma.$transaction(async (tx) => {
             const cart = await cartRepo.findCartByUserId(tx, userId);
-            if(!cart || cartItem.cartId !== cart.id) throw new NotFoundError('Cart not found'); 
+            if(!cart) throw new NotFoundError('Cart not found'); 
 
             const cartItem = await cartRepo.findCartItemById(tx, cartItemId);
             if(!cartItem) throw new NotFoundError('Cart item not found');

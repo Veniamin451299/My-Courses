@@ -1,0 +1,2358 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "Mini Market API",
+    "description": "PET-Project с сервером написанным на Express.js.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api",
+      "description": "Локальный сервер для разработки"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Health",
+      "description": "Операция отклика сервера"
+    },
+    {
+      "name": "User",
+      "description": "Операции с пользователем"
+    },
+    {
+      "name": "Products",
+      "description": "Операции с товарами"
+    },
+    {
+      "name": "Category",
+      "description": "Операции с категориями (АДМИН)"
+    },
+    {
+      "name": "Cart",
+      "description": "Операции с корзиной пользователя"
+    },
+    {
+      "name": "Order",
+      "description": "Операции с заказами"
+    },
+    {
+      "name": "Analytics",
+      "description": "Операции с аналитикой (АДМИН)"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Health запрос на отклик сервера",
+        "description": "Простой HTTP GET запрос к серверу, чтобы проверить его доступность и работоспособность.",
+        "operationId": "getHealth",
+        "responses": {
+          "200": {
+            "description": "Health GET запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Регистрация пользователя",
+        "description": "Отправляет POST запрос к БД с данными: почта, пароль. Система проверяет валидность данных, при успехе выдает роль \"посетителя\", оставляя данные в базе.",
+        "operationId": "registerUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Запрос выполнен успешно!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "422": {
+            "description": "Validation exception"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Авторизация пользователя",
+        "description": "Отправляет POST запрос к БД с данными: почта, пароль. Система проверяет валидность данных, сравнивает хэши паролей и jwt токен. При успехе предоставляет доступ пользователю и выдает новые jwt токены.",
+        "operationId": "loginUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Запрос выполнен успешно!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorizared error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Обновление токена из кэша",
+        "description": "Отправляет POST запрос к Redis с refresh токеном для выдачи новой пары jwt токенов: accessToken(expire: 15m), refreshToken(expire: 7d). Первый длится 15 минут, после чего данный запрос проверяет старый refresh токен, который валиден 7 дней. При успехе выдает новую пару на следующие временные сессии.",
+        "operationId": "refreshToken",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRefreshRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Запрос выполнен успешно!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRefreshResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorizared error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Выход пользователя из аккаунта",
+        "description": "Отправляет POST запрос к Redis с ID пользователя, чтобы инвалидировать jwt токены и выйти из аккаунта.",
+        "operationId": "logoutUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLogoutRequest"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "Запрос выполнен успешно!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserLogoutResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Получить данные о себе",
+        "description": "Отправляет GET запрос к БД, чтобы получить данные о пользователе по его ID.",
+        "operationId": "getMe",
+        "responses": {
+          "200": {
+            "description": "Запрос выполнен успешно!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorizared error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/categories": {
+      "get": {
+        "tags": [
+          "Category"
+        ],
+        "summary": "Получить все категории",
+        "description": "Отправляет GET запрос к БД, чтобы получить список всех категорий. Доступно без авторизации.",
+        "operationId": "getCategories",
+        "responses": {
+          "200": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Category"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "404": {
+            "description": "Not found error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Category"
+        ],
+        "summary": "Создание новой категории (АДМИН)",
+        "description": "Отправляет POST запрос к БД, чтобы создать новую категорию в системе. Требует прав администратора!",
+        "operationId": "createCategory",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Запрос выполнен успешно!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "403": {
+            "description": "Forbidden error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/categories/{categoryId}": {
+      "get": {
+        "tags": [
+          "Category"
+        ],
+        "summary": "Получить категорию по ID",
+        "description": "Отправляет GET запрос к БД. Возвращает категорию по её уникальному идентификатору.",
+        "operationId": "getCategoryById",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "path",
+            "description": "ID категории для возврата",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "404": {
+            "description": "Not found error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Category"
+        ],
+        "summary": "Обновить категорию (АДМИН)",
+        "description": "Отправляет PUT запрос к БД. Обновляет данные существующей категории. Требует прав администратора!",
+        "operationId": "updateCategory",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "path",
+            "description": "ID категории для обновления",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Запрос выполнен успешно!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "403": {
+            "description": "Forbidden error"
+          },
+          "404": {
+            "description": "Not found error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Category"
+        ],
+        "summary": "Удалить категорию (АДМИН)",
+        "description": "Отправляет DELETE запрос к серверу. Удаляет категорию по ID. Требует прав администратора! \n\nВнимание: это действие необратимо!",
+        "operationId": "deleteCategory",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "path",
+            "description": "ID категории для удаления",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Категория успешно удалена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "403": {
+            "description": "Forbidden error"
+          },
+          "404": {
+            "description": "Not found error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/products": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Получить все товары",
+        "description": "Отправляет GET запрос к БД, чтобы получить список всех товаров. Доступно без авторизации.",
+        "operationId": "getProducts",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Номер страницы",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "example": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Количество элементов на странице",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "example": 10
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "Молоко"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "404": {
+            "description": "Not found error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Создание нового товара (АДМИН)",
+        "description": "Отправляет POST запрос к БД, чтобы создать новый товар в системе. Требует прав администратора!",
+        "operationId": "createProducts",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Запрос выполнен успешно!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "403": {
+            "description": "Forbidden error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/products/{productId}": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Получить товар по ID",
+        "description": "Отправляет GET запрос к БД. Возвращает товар по его уникальному идентификатору.",
+        "operationId": "getProductById",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "ID товар для возврата",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "404": {
+            "description": "Not found error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Обновить товар (АДМИН)",
+        "description": "Отправляет PUT запрос к БД. Обновляет данные существующего товара. Требует прав администратора!",
+        "operationId": "updateProdyct",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "ID товара для обновления",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Запрос выполнен успешно!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "403": {
+            "description": "Forbidden error"
+          },
+          "404": {
+            "description": "Not found error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Удалить товар (АДМИН)",
+        "description": "Отправляет DELETE запрос к БД. Удаляет товар по его уникальному идентификатору. Требует прав администратора!",
+        "operationId": "deleteProduct",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "ID товара для удаления",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Товар успешно удалена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "403": {
+            "description": "Forbidden error"
+          },
+          "404": {
+            "description": "Not found error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/cart": {
+      "get": {
+        "tags": [
+          "Cart"
+        ],
+        "summary": "Получить корзину",
+        "description": "Отправляет GET запрос к БД, чтобы получить список товаров в корзине. \n\nНужна авторизация!",
+        "operationId": "getCart",
+        "responses": {
+          "200": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cart"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "401": {
+            "description": "Unauthorized error"
+          },
+          "404": {
+            "description": "Not found error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Cart"
+        ],
+        "summary": "Очистить корзину",
+        "description": "Отправляет DELETE запрос к БД, чтобы очистить корзину пользователя по ID пользователя. \n\nНужна авторизация!",
+        "operationId": "clearCart",
+        "responses": {
+          "200": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cart"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "401": {
+            "description": "Unauthorized error"
+          },
+          "404": {
+            "description": "Not found error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/cart/items": {
+      "post": {
+        "tags": [
+          "Cart"
+        ],
+        "summary": "Добавить в корзину",
+        "description": "Отправляет POST запрос к БД. Добавляет по ID пользователю, отправившего запрос, ID товара в корзину пользователя. Ищет корзину пользователя по ID, если нет - создает пользователю корзину. Если в корзине уже есть позиция с товаром - добавляет к количеству +1, если нет - создает позицию с товаром. Обновляется итоговая цена корзины \n\nНужна авторизация.",
+        "operationId": "addCartItem",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CartItemRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cart"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "401": {
+            "description": "Unauthorized error"
+          },
+          "404": {
+            "description": "Not found error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/cart/items/{id}": {
+      "put": {
+        "tags": [
+          "Cart"
+        ],
+        "summary": "Изменить количество товара в корзине",
+        "description": "Отправляет PUT запрос к БД. Изменяет количество товара в корзине пользователя по ID позиции корзины и новому количеству. Обновляется итоговая цена корзины. \n\nНужна авторизация.",
+        "operationId": "updateCartItemQuantity",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID позиции корзины",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "jgQoV28D"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CartItemUpdateItemRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cart"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "401": {
+            "description": "Unauthorized error"
+          },
+          "404": {
+            "description": "Not found error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Cart"
+        ],
+        "summary": "Удалить позицию из корзины",
+        "description": "Отправляет DELETE запрос к БД. Удаляет позицию из корзины пользователя по ID пользователя и позиции корзины. Обновляется итоговая цена корзины. \n\nНужна авторизация.",
+        "operationId": "deleteCartItem",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID позиции корзины",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "jgQoV28D"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cart"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "401": {
+            "description": "Unauthorized error"
+          },
+          "404": {
+            "description": "Not found error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/orders": {
+      "get": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "Получить все заказы пользователя",
+        "description": "Возвращает список всех заказов текущего пользователя. \n\nТребуется авторизация.",
+        "operationId": "getOrders",
+        "responses": {
+          "200": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Order"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized error"
+          },
+          "404": {
+            "description": "Not found error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "Создание нового заказа",
+        "description": "Создаёт заказ из текущей корзины пользователя. \n\nТребуется авторизация.",
+        "operationId": "createOrder",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Заказ успешно создан!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error (например, корзина пуста)"
+          },
+          "401": {
+            "description": "Unauthorized error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/orders/{id}": {
+      "get": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "Получить заказ по ID",
+        "description": "Отправляет GET запрос к БД. Возвращает заказ пользователя по его уникальному идентификатору. \n\nТребуется авторизация!",
+        "operationId": "getOrderById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID заказа",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "jgQoV28D"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "401": {
+            "description": "Unauthorized error"
+          },
+          "404": {
+            "description": "Not found error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "Обновить статус заказа",
+        "description": "Отправялет PUT запрос к БД. Обновляет статус заказа администратором. \n\nТребуется авторизация администратора!",
+        "operationId": "updateOrderStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID заказа",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "jgQoV28D"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderUpdateStatusRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "401": {
+            "description": "Unauthorized error"
+          },
+          "403": {
+            "description": "Forbidden error"
+          },
+          "404": {
+            "description": "Not found error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/analytics/event": {
+      "post": {
+        "tags": [
+          "Analytics"
+        ],
+        "summary": "Создать событие",
+        "description": "Отправляет POST запрос к БД. Регистрирует новое событие в аналитике. \n\nТребуется авторизация администратора!",
+        "operationId": "createEventAnalytics",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalyticsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Analytics"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "401": {
+            "description": "Unauthorized error"
+          },
+          "403": {
+            "description": "Forbidden error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/analytics/top-products": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "summary": "Получить топ-продуктов",
+        "description": "Отправляет GET запрос к БД. Возвращает топ-продуктов. \n\nТребуется авторизация администратора!",
+        "operationId": "getTopProductsAnalytics",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Количество товаров в топе",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "example": 5,
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsTopProducts"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "401": {
+            "description": "Unauthorized error"
+          },
+          "403": {
+            "description": "Forbidden error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/analytics/revenue": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "summary": "Получить прибыль",
+        "description": "Отправляет GET запрос к БД. Возвращает прибыль за указанный период. \n\nТребуется авторизация администратора!",
+        "operationId": "getRevenueAnalytics",
+        "parameters": [
+          {
+            "name": "period",
+            "in": "query",
+            "description": "Период, в котором нужно получить прибыль",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "month",
+              "default": "month"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsRevenue"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "401": {
+            "description": "Unauthorized error"
+          },
+          "403": {
+            "description": "Forbidden error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/analytics/user-stats": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "summary": "Получить статистику по пользователям",
+        "description": "Отправляет GET запрос к БД. Возвращает статистику по пользователям. \n\nТребуется авторизация администратора!",
+        "operationId": "getUserStatsAnalytics",
+        "responses": {
+          "200": {
+            "description": "Запрос успешно выполнен!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsUserStats"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request error"
+          },
+          "401": {
+            "description": "Unauthorized error"
+          },
+          "403": {
+            "description": "Forbidden error"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Health": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "(200) OK"
+          },
+          "message": {
+            "type": "string",
+            "example": "Mini-market API server is running"
+          },
+          "timestamp": {
+            "type": "string",
+            "example": "2026-08-23T19:40:49.385Z"
+          },
+          "version": {
+            "type": "string",
+            "example": "1.0.0"
+          },
+          "database": {
+            "type": "string",
+            "example": "PostgreSQL"
+          }
+        }
+      },
+      "UserRequest": {
+        "required": [
+          "email",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "ivanov@email.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "12345678"
+          }
+        }
+      },
+      "UserResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "email": {
+            "type": "string",
+            "example": "ivanov@email.com"
+          },
+          "name": {
+            "type": "string",
+            "example": "Ivan"
+          },
+          "role": {
+            "type": "string",
+            "example": "CUSTOMER",
+            "enum": [
+              "CUSTOMER",
+              "ADMIN"
+            ],
+            "default": "CUSTOMER"
+          },
+          "cart": {
+            "$ref": "#/components/schemas/Cart"
+          },
+          "orders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Order"
+            }
+          }
+        }
+      },
+      "UserRefreshRequest": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6IkNVU1RPTUVSIiwiaWF0IjoxNzg3NTE5ODQzLCJleHAiOjE3ODgxMjQ2NDN9.yPsiCSBaYALY7e-s8XO4772fy9DzKXoRMm8wlId2OpU"
+          }
+        }
+      },
+      "UserRefreshResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6IkNVU1RPTUVSIiwiaWF0IjoxNzg3NTE5ODQzLCJleHAiOjE3ODc1MjA3NDN9.Nytnfl0YWgACdIRFlrsJbT1JPMdiKGt4OCbyOzc4sEs"
+          },
+          "refreshToken": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6IkNVU1RPTUVSIiwiaWF0IjoxNzg3NTE5ODQzLCJleHAiOjE3ODgxMjQ2NDN9.yPsiCSBaYALY7e-s8XO4772fy9DzKXoRMm8wlId2OpU"
+          }
+        }
+      },
+      "UserLogoutRequest": {
+        "type": "object",
+        "properties": {}
+      },
+      "UserLogoutResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Logout successfully"
+          }
+        }
+      },
+      "Product": {
+        "required": [
+          "categoryId",
+          "images",
+          "name",
+          "price",
+          "stock"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Молоко"
+          },
+          "description": {
+            "type": "string",
+            "example": "Молоко \"Минская марка\" 0.75 л."
+          },
+          "price": {
+            "type": "number",
+            "format": "float",
+            "example": 2.35
+          },
+          "stock": {
+            "type": "integer",
+            "example": 20,
+            "default": 0
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "https://images.pexels.com/photos/5946717/pexels-photo-5946717.jpeg"
+            }
+          },
+          "categoryId": {
+            "type": "integer",
+            "example": 1
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true,
+            "default": true
+          }
+        }
+      },
+      "ProductRequest": {
+        "required": [
+          "categoryId",
+          "images",
+          "name",
+          "price",
+          "stock"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Молоко"
+          },
+          "description": {
+            "type": "string",
+            "example": "Молоко \"Минская марка\" 0.75 л."
+          },
+          "price": {
+            "type": "number",
+            "format": "float",
+            "example": 2.35
+          },
+          "stock": {
+            "type": "integer",
+            "example": 20,
+            "default": 0
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "https://images.pexels.com/photos/5946717/pexels-photo-5946717.jpeg"
+            }
+          },
+          "categoryId": {
+            "type": "string",
+            "example": "wkRDNQjr"
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true,
+            "default": true
+          }
+        }
+      },
+      "Category": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "food"
+          },
+          "description": {
+            "type": "string",
+            "example": "Продукты питания"
+          }
+        }
+      },
+      "CategoryRequest": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "food"
+          },
+          "description": {
+            "type": "string",
+            "example": "Продукты питания"
+          }
+        }
+      },
+      "Cart": {
+        "required": [
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "1"
+          },
+          "userId": {
+            "type": "string",
+            "example": "1"
+          },
+          "totalPrice": {
+            "type": "number",
+            "format": "float",
+            "example": 8.45
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CartItem"
+            }
+          }
+        }
+      },
+      "CartItem": {
+        "required": [
+          "cartId",
+          "price",
+          "productId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "1"
+          },
+          "cartId": {
+            "type": "string",
+            "example": "1"
+          },
+          "productId": {
+            "type": "string",
+            "example": "1"
+          },
+          "quantity": {
+            "type": "integer",
+            "example": 2,
+            "default": 1
+          },
+          "price": {
+            "type": "number",
+            "format": "float",
+            "example": 4.8
+          }
+        }
+      },
+      "CartItemRequest": {
+        "required": [
+          "cartId",
+          "productId"
+        ],
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "example": 2,
+            "default": 1
+          }
+        }
+      },
+      "CartItemUpdateItemRequest": {
+        "required": [
+          "quantity"
+        ],
+        "type": "object",
+        "properties": {
+          "quantity": {
+            "type": "integer",
+            "example": 2
+          }
+        }
+      },
+      "Order": {
+        "required": [
+          "address",
+          "items",
+          "totalPrice",
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "1V231XKq"
+          },
+          "userId": {
+            "type": "string",
+            "example": "DoQegRY9"
+          },
+          "totalPrice": {
+            "type": "number",
+            "format": "float",
+            "example": 4.8
+          },
+          "status": {
+            "type": "string",
+            "example": "PENDING",
+            "enum": [
+              "PENDING",
+              "PAID",
+              "SHIPPED",
+              "DELIVERED",
+              "CANCELED"
+            ],
+            "default": "PENDING"
+          },
+          "paymentId": {
+            "type": "string",
+            "example": "e1824IW82364jw23819sae123"
+          },
+          "address": {
+            "$ref": "#/components/schemas/Order_address"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderItem"
+            }
+          }
+        }
+      },
+      "OrderRequest": {
+        "required": [
+          "address"
+        ],
+        "type": "object",
+        "properties": {
+          "address": {
+            "$ref": "#/components/schemas/Order_address"
+          }
+        }
+      },
+      "OrderItem": {
+        "required": [
+          "orderId",
+          "price",
+          "productId",
+          "quantity"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "JG2M7X6w"
+          },
+          "orderId": {
+            "type": "string",
+            "example": "1V231XKq"
+          },
+          "productId": {
+            "type": "string",
+            "example": "jgQoV28D"
+          },
+          "quantity": {
+            "type": "integer",
+            "example": 2
+          },
+          "price": {
+            "type": "number",
+            "format": "float",
+            "example": 2.4
+          }
+        }
+      },
+      "OrderUpdateStatusRequest": {
+        "required": [
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "PAID",
+            "enum": [
+              "PENDING",
+              "PAID",
+              "SHIPPED",
+              "DELIVERED",
+              "CANCELED"
+            ]
+          }
+        }
+      },
+      "Analytics": {
+        "required": [
+          "event",
+          "metadata",
+          "sessionId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "1V231XKq"
+          },
+          "event": {
+            "type": "string",
+            "example": "purchase"
+          },
+          "userId": {
+            "type": "string",
+            "example": "DoQegRY9"
+          },
+          "productId": {
+            "type": "string",
+            "example": "jgQoV28D"
+          },
+          "sessionId": {
+            "type": "string",
+            "description": "ID сессии пользователя со стороны фронтенда",
+            "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+          },
+          "ip": {
+            "type": "string",
+            "example": "192.164.100.1"
+          },
+          "userAgent": {
+            "type": "string",
+            "description": "Информация о браузере или устройстве пользователя",
+            "example": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Analytics_metadata"
+          }
+        }
+      },
+      "AnalyticsRequest": {
+        "required": [
+          "event",
+          "metadata",
+          "sessionId"
+        ],
+        "type": "object",
+        "properties": {
+          "event": {
+            "type": "string",
+            "example": "purchase"
+          },
+          "userId": {
+            "type": "string",
+            "example": "DoQegRY9"
+          },
+          "productId": {
+            "type": "string",
+            "example": "jgQoV28D"
+          },
+          "sessionId": {
+            "type": "string",
+            "description": "ID сессии пользователя со стороны фронтенда",
+            "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Analytics_metadata"
+          }
+        }
+      },
+      "AnalyticsTopProducts": {
+        "required": [
+          "data",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsTopProduct"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "Общее количество покупок",
+            "example": 100
+          }
+        }
+      },
+      "AnalyticsTopProduct": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "example": "jgQoV28D"
+          },
+          "productName": {
+            "type": "string",
+            "example": "Молоко"
+          },
+          "productPrice": {
+            "type": "number",
+            "format": "float",
+            "example": 2.35
+          },
+          "count": {
+            "type": "integer",
+            "description": "Количество покупок этого товара",
+            "example": 42
+          },
+          "rank": {
+            "type": "integer",
+            "description": "Место в рейтинге (начиная с 1)",
+            "example": 1
+          },
+          "percentage": {
+            "type": "number",
+            "description": "Доля от общего числа покупок (в процентах)",
+            "format": "float",
+            "example": 15.5
+          }
+        }
+      },
+      "AnalyticsRevenue": {
+        "required": [
+          "data",
+          "summary"
+        ],
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AnalyticsRevenueData"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/AnalyticsRevenueSummary"
+          }
+        }
+      },
+      "AnalyticsRevenueData": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "example": "2026-08-23T19:40:49.385Z"
+          },
+          "orderCount": {
+            "type": "integer",
+            "example": 100
+          },
+          "revenue": {
+            "type": "number",
+            "format": "float",
+            "example": 100.5
+          }
+        }
+      },
+      "AnalyticsRevenueSummary": {
+        "type": "object",
+        "properties": {
+          "totalRevenue": {
+            "type": "integer",
+            "example": 100
+          },
+          "totalOrders": {
+            "type": "number",
+            "format": "float",
+            "example": 100.5
+          },
+          "averageOrderValue": {
+            "type": "number",
+            "format": "float",
+            "example": 100.5
+          },
+          "period": {
+            "type": "string",
+            "example": "month"
+          }
+        }
+      },
+      "AnalyticsUserStats": {
+        "type": "object",
+        "properties": {
+          "totalUsers": {
+            "type": "integer",
+            "example": 10
+          },
+          "activeUsers": {
+            "type": "integer",
+            "example": 5
+          },
+          "newUsers": {
+            "type": "integer",
+            "example": 3
+          },
+          "retentionRate": {
+            "type": "number",
+            "format": "float",
+            "example": 0.5
+          },
+          "conversionRate": {
+            "type": "number",
+            "format": "float",
+            "example": 0.7
+          }
+        }
+      },
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "type": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "Error": {
+        "required": [
+          "code",
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "Order_address": {
+        "required": [
+          "city",
+          "house",
+          "street"
+        ],
+        "type": "object",
+        "properties": {
+          "city": {
+            "type": "string",
+            "example": "Minsk"
+          },
+          "street": {
+            "type": "string",
+            "example": "Kazinca"
+          },
+          "house": {
+            "type": "string",
+            "example": "23"
+          },
+          "apartment": {
+            "type": "string",
+            "example": "45"
+          }
+        }
+      },
+      "Analytics_metadata": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "example": "1V231XKq"
+          },
+          "totalPrice": {
+            "type": "number",
+            "example": 4.7
+          }
+        },
+        "description": "Дополнительные данные о событии"
+      },
+      "inline_response_200": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Product"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/inline_response_200_pagination"
+          }
+        }
+      },
+      "inline_response_200_pagination": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "pages": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

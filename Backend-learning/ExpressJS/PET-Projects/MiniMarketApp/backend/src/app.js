@@ -6,6 +6,8 @@ const router = require('./routes');
 const redis = require('./config/redis');
 const logger = require('./config/logger'); 
 const { limiter } = require('./middlewares/rateLimiter');
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('../swagger.json'); // или .yaml
 
 const app = express();
 let server = null;
@@ -23,6 +25,7 @@ if (config.nodeEnv === 'development') {
 }
 
 app.use('/api', router);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(errorHandler);
 
 async function startServer() {

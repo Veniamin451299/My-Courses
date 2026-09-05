@@ -1,0 +1,18 @@
+# .dockerignore - это файл с перечнем того, что не надо включать в сборку контейнера.
+# Предназначен для экономии памяти при сборке.
+node_modules/
+.env
+.agents/
+.claude/
+.windsurf/
+venv/
+.vscode/
+.git/
+*.log
+tests/
+__pycache__/
+*.md
+*.env.*
+.DB_Store
+converage/
+.nyc_output/

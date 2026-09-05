@@ -1,25 +1,29 @@
 // backend/prisma/seed.js
 const dotenv =  require('dotenv/config');
 const { PrismaPg } = require('@prisma/adapter-pg');
-const { pg } = require('pg');
-const { PrismaClient } = require('@prisma/client'); 
+const { Pool } = require('pg');
+const { PrismaClient } = require('@prisma/client');
+const config = require('../src/config/env');
+const bcrypt = require('../src/utils/bcrypt'); 
 
-const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
+
+const PASSWORD = await bcrypt.hash(config.passwordHash);
 
 async function main() {
   console.log("🚀 Запуск сида через npx prisma db seed...");
 
   const existingAdmin = await prisma.user.findUnique({
-    where: { email: "admin@mail.com" }
+    where: { email: config.adminEmail }
   });
 
   if (!existingAdmin) {
     await prisma.user.create({
       data: {
-        email: "admin@mail.com",
-        passwordHash: "$2b$10$EPY9b0U/f36ySgIex74scO5i8Ue0zD9gW8zEfe8W9a08tP7w9uQ3q",
+        email: config.adminEmail,
+        passwordHash: PASSWORD,
         name: "Admin",
         role: "ADMIN"
       },

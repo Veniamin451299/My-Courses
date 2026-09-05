@@ -4,7 +4,7 @@ const prisma = require('../config/prisma');
 class ProductRepository {
   // @param: client - {prisma, tx}
   async findAll({ skip, take, where, orderBy }) {
-    return prisma.product.findMany({ skip, take, where, orderBy });
+    return prisma.product.findMany({ skip: skip, take: take, where: where, orderBy: orderBy });
   }
 
   async count(where) {

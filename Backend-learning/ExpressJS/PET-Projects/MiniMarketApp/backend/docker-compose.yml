@@ -1,0 +1,46 @@
+# path: backend/docker-compose.yml
+# docker-compose.yml нужен для создания контейнеров разных сред и сервисов
+# т.к. БД (postgres), кэшеровние (redis), само приложение (API)'
+services:
+  # Сервис 1: База данных
+  postgres:
+    image: postgres:15-alpine
+    container_name: database
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Сервис 2: Redis кэширование
+  redis:
+    image: redis:6-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+  
+  # Сервис 3: MiniMarket API
+  api:
+    build: .        # Собирает из DockerFile в текущей папке
+    container_name: mini-market-api
+    ports:
+      - "3000:3000"
+    depends_on:     # Ожидаем запуск БД и Redis
+      - postgres
+      - redis
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      HASHID_SALT: ${HASHID_SALT}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+    volumes:
+      - .:/app      # В режиме разработке монтирует код с изменениями автоматически в контейнер
+
+volumes:
+  postgres_data:    # Тут хранятся данные БД

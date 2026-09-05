@@ -37,7 +37,7 @@ class AuthController {
                 }
             });
         } catch (err) {
-            next(new BadRequestError(`Interanl Server Error: ${err.message}`));
+            next(new BadRequestError(`Bad request error: ${err.message}`));
         }
     };
 
@@ -70,7 +70,7 @@ class AuthController {
                 }
             });
         } catch (err) {
-            next(new BadRequestError(`Interanl Server Error: ${err.message}`));
+            next(new BadRequestError(`Bad request error: ${err.message}`));
         }
     };
 
@@ -84,14 +84,14 @@ class AuthController {
         const decoded = JWTService.verifyToken(refreshToken);
         if (!decoded) return next(new UnauthorizedError("Invalid refresh token"));
 
-        const storedToken = await userService.getRefreshToken(decoded.userId);
+        const storedToken = await userService.getRefreshToken(decoded.id);
         if (storedToken !== refreshToken) return next(new UnauthorizedError("Invalid refresh token"));
 
         const newAccessToken = JWTService.generateToken(decoded.userId, decoded.role, "15m");
         const newRefreshToken = JWTService.generateToken(decoded.userId, decoded.role, "7d");
         await userService.saveRefreshToken(decoded.userId, newRefreshToken);
 
-        res.json({
+        return res.json({
             accessToken: newAccessToken,
             refreshToken: newRefreshToken,
         });
@@ -103,10 +103,11 @@ class AuthController {
      * **/
     async logout(req, res, next) { 
         try {
+            console.log(req.user.id);
             await userService.deleteRefreshToken(req.user.id);
-            res.status(200).json({ message: "Logout successfully" });
+            return res.status(200).json({ message: "Logout successfully" });
         } catch (err) {
-            next(new BadRequestError(`Interanl Server Error: ${err.message}`));
+            return next(new BadRequestError(`Bad request error: ${err.message}`));
         }
     };
 
@@ -116,13 +117,13 @@ class AuthController {
      * **/
     async me(req, res, next) { 
         try {
-            const decodedId = HashId.decodeHash(req.user.id);
-            if (!decodedId) return next(new BadRequestError("Invalid user id"));
+            const decodedUserId = hashedId.decodeHash(req.user.hashedId);
+            if (!decodedUserId) return next(new BadRequestError('Invalid user id'));
 
-            const user = await userService.findUserById(decodedId);
+            const user = await userService.findUserById(decodedUserId);
             if (!user) return next(new UnauthorizedError("Invalid user"));
 
-            res.json({
+            return res.status(200).json({
                 message: "Get user successfully",
                 data: {
                     id: hashedId.generateHash(user.id),
@@ -131,7 +132,8 @@ class AuthController {
                 }
             });
         } catch (err) {
-            next(new BadRequestError(`Interanl Server Error: ${err.message}`));
+            console.log('ERROR in me: ', err);
+            return next(new BadRequestError(`Bad request error: ${err.message}`));
         }
     }
 }
