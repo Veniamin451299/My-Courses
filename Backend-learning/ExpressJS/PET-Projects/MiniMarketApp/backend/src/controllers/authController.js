@@ -37,6 +37,7 @@ class AuthController {
                 }
             });
         } catch (err) {
+            console.error('Register error:', err);
             next(new BadRequestError(`Bad request error: ${err.message}`));
         }
     };

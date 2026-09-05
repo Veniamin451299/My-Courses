@@ -95,19 +95,19 @@ class ToDoService {
     async updateTask(userId, taskId, updateData) {
         try {
             const updated = await prisma.task.update({
-            where: { id_userId: { id: taskId, userId: userId }},
-            data: updateData
-        });
+                where: { id_userId: { id: taskId, userId: userId }},
+                data: updateData
+            });
 
-        // Инвалидация кэша
-        try {
-            await redis.del(`tasks:${userId}`);
-            await redis.del(`task:${userId}:${taskId}`);
-        } catch (redisError) {
-            console.error('Redis Error (DEL): ', redisError);
-        }
+            // Инвалидация кэша
+            try {
+                await redis.del(`tasks:${userId}`);
+                await redis.del(`task:${userId}:${taskId}`);
+            } catch (redisError) {
+                console.error('Redis Error (DEL): ', redisError);
+            }
 
-        return updated;
+            return updated;
         } catch (error) {
             // Код ошибки P2025 в Prisma означает, что запись для обновления не найдена
             if (error.code === 'P2025') return null;
@@ -124,16 +124,16 @@ class ToDoService {
         try {
             const deleted = await prisma.task.delete({
             where:{ id_userId: { id: taskId, userId: userId } },
-        });
+            });
 
-        // Инвалидация кэша
-        try {
-            await redis.del(`tasks:${userId}`);
-            await redis.del(`task:${userId}:${taskId}`);
-        } catch (redisError) {
-            console.error('Redis Error (DEL): ', redisError);
-        }
-        return deleted;
+            // Инвалидация кэша
+            try {
+                await redis.del(`tasks:${userId}`);
+                await redis.del(`task:${userId}:${taskId}`);
+            } catch (redisError) {
+                console.error('Redis Error (DEL): ', redisError);
+            }
+            return deleted;
         } catch (error) {
             // Код ошибки P2025 в Prisma означает, что запись для удаления не найдена
             if (error.code === 'P2025') return null;

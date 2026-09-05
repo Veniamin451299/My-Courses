@@ -11,7 +11,7 @@ router.use('/health', (_req, res) => {
         message: 'TODO API is running',
         timestamp: new Date().toISOString(),
         version: '1.0.0',
-        database: 'Object TODO DB', 
+        database: 'TODO POSTGRESQL DB',
     });
 });
 

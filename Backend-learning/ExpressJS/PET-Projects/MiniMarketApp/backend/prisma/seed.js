@@ -1,16 +1,15 @@
 // backend/prisma/seed.js
-const dotenv =  require('dotenv/config');
-const { PrismaPg } = require('@prisma/adapter-pg');
-const { Pool } = require('pg');
-const { PrismaClient } = require('@prisma/client');
-const config = require('../src/config/env');
-const bcrypt = require('../src/utils/bcrypt'); 
+import { PrismaPg } from '@prisma/adapter-pg';
+import { Pool } from 'pg';
+import { PrismaClient } from '@prisma/client';
+import config from '../src/config/env.js';
+import bcrypt from '../src/utils/bcrypt.js';
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
-const PASSWORD = await bcrypt.hash(config.passwordHash);
+const PASSWORD = await bcrypt.hash(config.adminPassword); // ✅ используем adminPassword из env
 
 async function main() {
   console.log("🚀 Запуск сида через npx prisma db seed...");
@@ -50,8 +49,8 @@ async function main() {
       price: Math.floor(Math.random() * 1000) + 100,
       stock: Math.floor(Math.random() * 50) + 1,
       images: [
-        `https://picsum.photos{i}/200/300`,
-        `https://picsum.photos{i + 100}/400/300`
+        `https://picsum.photos/${i}/200/300`,
+        `https://picsum.photos/${i + 100}/400/300`
       ],
       categoryId: category.id,
       isActive: Math.random() > 0.1
