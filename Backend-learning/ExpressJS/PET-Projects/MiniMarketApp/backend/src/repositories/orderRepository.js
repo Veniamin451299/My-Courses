@@ -19,7 +19,7 @@ class OrderRepository {
 
     // POST method create order
     async createOrder(client, data) {
-        return client.order.create({ data: data, include: { items: true } });
+        return client.order.create({ data: data, include: { items: { include: { product: true } } } });
     };
 
     // PUT method update status order
