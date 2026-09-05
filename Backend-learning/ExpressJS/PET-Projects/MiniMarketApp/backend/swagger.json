@@ -983,7 +983,7 @@
           "required": true
         },
         "responses": {
-          "200": {
+          "201": {
             "description": "Запрос успешно выполнен!",
             "content": {
               "application/json": {
