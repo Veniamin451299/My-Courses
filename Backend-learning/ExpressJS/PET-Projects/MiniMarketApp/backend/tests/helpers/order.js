@@ -25,11 +25,12 @@ const getOrderById = async (accessToken, orderId) => {
     }
 };
 
-const createOrder = async (accessToken) => {
+const createOrder = async (accessToken, address) => {
     try {
         const res = await request(app)
             .post('/api/orders')
-            .set('Authorization', `Bearer ${accessToken}`);
+            .set('Authorization', `Bearer ${accessToken}`)
+            .send({ address });
         return res;
     } catch (err) {
         logger.error('Create order failed', err);

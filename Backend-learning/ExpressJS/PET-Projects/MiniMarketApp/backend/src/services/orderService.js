@@ -38,9 +38,7 @@ class OrderService {
     async createOrder(userId, address) {
       return await prisma.$transaction(async (tx) => {
          // 1. get user cart
-        console.log('userId in createOrder:', userId);
         const cart = await cartRepo.findCartByUserId(tx, userId);
-        console.log('cart found:', cart);
         if(!cart?.items.length) throw new BadRequestError('Cart is empty');
 
         // 2, Check if availability of products
