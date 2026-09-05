@@ -15,7 +15,6 @@ class OrderService {
      * **/
     async getAllOrder(userId) {
         const order = await orderRepo.findOrdersByUserId(prisma, userId);
-        if (!order || order.length === 0) throw new NotFoundError('Order not found');
         return order;
     };
 

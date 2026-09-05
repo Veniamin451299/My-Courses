@@ -4,7 +4,7 @@
   "description": "E-commerce API",
   "main": "src/app.js",
   "prisma": {
-    "seed": "node --experimental-detect-module prisma/seed.js"
+    "seed": "node ./prisma/seed.js"
   },
   "directories": {
     "test": "tests"

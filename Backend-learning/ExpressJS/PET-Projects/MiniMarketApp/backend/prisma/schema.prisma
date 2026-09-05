@@ -103,7 +103,7 @@ model Analytics {
   event     String
   userId    Int?
   productId Int?
-  sessionId String?
+  sessionId String
   ip        String?
   userAgent String?
   metadata  Json

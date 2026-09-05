@@ -15,7 +15,6 @@ class OrderController {
             if (!decodedUserId) return next(new BadRequestError('Invalid user id'));
 
             const orders = await orderService.getAllOrder(decodedUserId);
-            if (!orders || orders.length === 0) return next(new NotFoundError('Orders not found'));
 
             return res.status(200).json({ 
                 message: "Get orders successfully", 

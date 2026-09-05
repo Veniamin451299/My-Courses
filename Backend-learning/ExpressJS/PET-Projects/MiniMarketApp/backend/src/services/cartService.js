@@ -50,7 +50,7 @@ class CartService {
             // 4. Recalculate total price
             const items = await cartItemRepo.findCartItemByCartId(tx, cart.id);
             const totalPrice = items.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
-            await cartRepo.updateCartTotal(tx, cart.id, totalPrice);
+            await cartRepo.updateCartTotal(tx, cart.id, totalPrice.toFixed(2));
             // 5. Return the updated cart to the user
             return await cartRepo.findCartByUserId(tx, userId);
         });
@@ -70,7 +70,7 @@ class CartService {
             // Recalculate total price
             const items = await cartItemRepo.findCartItemByCartId(tx, cart.id);
             const totalPrice = items.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
-            await cartRepo.updateCartTotal(tx, cart.id, totalPrice);
+            await cartRepo.updateCartTotal(tx, cart.id, totalPrice.toFixed(2));
             return await cartRepo.findCartByUserId(tx, userId);
         });
     };
@@ -91,7 +91,7 @@ class CartService {
             // Recalculate total price
             const items = await cartItemRepo.findCartItemByCartId(tx, cart.id);
             const totalPrice = items.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
-            await cartRepo.updateCartTotal(tx, cart.id, totalPrice);
+            await cartRepo.updateCartTotal(tx, cart.id, totalPrice.toFixed(2));
             return await cartRepo.findCartByUserId(tx, userId);
         });
     };
